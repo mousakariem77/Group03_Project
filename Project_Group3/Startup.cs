@@ -52,7 +52,7 @@ namespace Project_Group3
             {
                 endpoints.MapControllerRoute(
                     name: "default",
-                    pattern: "{controller=Home}/{action=Index}/{id?}");
+                    pattern: "{controller=Admin}/{action=Instructor}/{id?}");
             });
         }
     }
