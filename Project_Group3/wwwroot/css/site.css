@@ -335,3 +335,65 @@ h5.course-name {
   overflow: hidden;
   text-overflow: ellipsis;
 }
+/* Home - CourseDetail */
+.instructor-item{
+  width: 100px;
+  height: auto;
+  margin-top: 20px;
+}
+.instructor-item label{
+  width: 200px;
+}
+.instructor-img{
+  width: 100%;
+}
+.erroll-btn{
+  width: 15rem;
+  height: 4rem;
+}
+.erroll-btn h5{
+  font-weight: 700;
+}
+.bird-intro{
+  margin: .1rem 0 0 9rem;
+}
+.bird-intro h6{
+  margin-left: 5rem;
+}
+.box-chaper{
+  cursor: pointer;
+}
+.chapter-list{
+  background-color: #F2F1F8;
+  justify-content: space-between;
+}
+.chapter-item{
+  width: 60rem;
+}
+.chapter-item i{
+  padding-top: 2px;
+}
+.quanity-lesson{
+  margin: auto;
+}
+.lesson-item h6{
+  font-weight: 400;
+}
+.info-title label{
+  padding: 5px;
+  margin-left: -15px;
+}
+.feedback-container{
+  margin-top: 50px;
+  background-color: #F3F4F6 !important;
+}
+.feedback-container .star-container{
+  margin-left: 10rem;
+}
+#feedback{
+  border-right: 1px solid #DADBDD;
+}
+.feedback-post textarea {
+  width: 100%;
+  height: 200px;
+}

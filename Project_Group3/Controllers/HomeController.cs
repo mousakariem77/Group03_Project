@@ -14,14 +14,18 @@ namespace Project_Group3.Controllers
 {
     public class HomeController : Controller
     {
-        IInstructorRepository instructorRepository = null;
+       IInstructorRepository instructorRepository = null;
         ICourseRepository courseRepository = null;
         ICategoryRepository categoryRepository = null;
+        IInstructRepository instructRepository = null;
+        ILearnerRepository learnerRepository = null;
         public HomeController() {
             courseRepository = new CourseRepository();
             categoryRepository = new CategoryRepository();
             instructorRepository = new InstructorRepository();
-        } 
+            instructRepository = new InstructRepository();
+            learnerRepository = new LearnerRepository();
+        }
             
 
         public IActionResult Index()
@@ -58,8 +62,29 @@ namespace Project_Group3.Controllers
 
         public IActionResult Infomation()
         {
-            // TODO: Your code here
+            
             return View();
+        }
+
+        public IActionResult CourseDetail(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+            var instruct = instructRepository.GetInstructByID(id.Value);
+            if (instruct== null)
+            {
+                return NotFound();
+            }
+            var course = courseRepository.GetCourses();
+            var instructor = instructorRepository.GetInstructors();
+            
+            var courseInfo = course.FirstOrDefault(c => c.CourseId == instruct.CourseId);
+            var instructorInfo = instructor.FirstOrDefault(i => i.InstructorId == instruct.InstructorId);
+
+
+            return View(Tuple.Create(courseInfo, instructorInfo));
         }
         
         
