@@ -1,20 +1,20 @@
 {
   "format": 1,
   "restore": {
-    "D:\\Group03_Project\\Project_Group3\\Project_Group3.csproj": {}
+    "D:\\Resource\\Code\\DAN\\Group03_Project\\Project_Group3\\Project_Group3.csproj": {}
   },
   "projects": {
-    "D:\\Group03_Project\\Project_Group3\\Project_Group3.csproj": {
+    "D:\\Resource\\Code\\DAN\\Group03_Project\\Project_Group3\\Project_Group3.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\Group03_Project\\Project_Group3\\Project_Group3.csproj",
+        "projectUniqueName": "D:\\Resource\\Code\\DAN\\Group03_Project\\Project_Group3\\Project_Group3.csproj",
         "projectName": "Project_Group3",
-        "projectPath": "D:\\Group03_Project\\Project_Group3\\Project_Group3.csproj",
-        "packagesPath": "C:\\Users\\Mou Sa Ka Riem\\.nuget\\packages\\",
-        "outputPath": "D:\\Group03_Project\\Project_Group3\\obj\\",
+        "projectPath": "D:\\Resource\\Code\\DAN\\Group03_Project\\Project_Group3\\Project_Group3.csproj",
+        "packagesPath": "C:\\Users\\LEGION\\.nuget\\packages\\",
+        "outputPath": "D:\\Resource\\Code\\DAN\\Group03_Project\\Project_Group3\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\Mou Sa Ka Riem\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\LEGION\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -80,7 +80,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.102\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.101\\RuntimeIdentifierGraph.json"
         }
       }
     }
