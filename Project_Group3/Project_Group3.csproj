@@ -5,7 +5,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="WebLibrary.dll">
-      <HintPath>D:\Thu_Nghiem\Project_Group3</HintPath>
+      <HintPath>D:\2024\Group03_Project\Project_Group3</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>

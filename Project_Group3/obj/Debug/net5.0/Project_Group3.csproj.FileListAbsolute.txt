@@ -370,3 +370,6 @@ D:\2024\Group03_Project\Project_Group3\obj\Debug\net5.0\Project_Group3.genruntim
 D:\2024\Group03_Project\Project_Group3\obj\Debug\net5.0\ref\Project_Group3.dll
 D:\2024\Group03_Project\Project_Group3\obj\Debug\net5.0\Razor\Views\Admin\Instructor.cshtml.g.cs
 D:\2024\Group03_Project\Project_Group3\obj\Debug\net5.0\Razor\Views\Admin\Learner.cshtml.g.cs
+D:\2024\Group03_Project\Project_Group3\obj\Debug\net5.0\Razor\Views\User\InstructorRegister.cshtml.g.cs
+D:\2024\Group03_Project\Project_Group3\obj\Debug\net5.0\Razor\Views\User\Login.cshtml.g.cs
+D:\2024\Group03_Project\Project_Group3\obj\Debug\net5.0\Razor\Views\User\Register.cshtml.g.cs
