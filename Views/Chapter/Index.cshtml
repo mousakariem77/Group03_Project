@@ -1,0 +1,50 @@
+@model IEnumerable<WebLibrary.Models.Chapter>;
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+
+<h1>List Chaper</h1>
+<a class="btn btn-success mb-2" href="@Url.Action("Create", "Chapter", new { courseId = ViewBag.CourseId })">Add new Chapter</a>
+<a class="btn btn-success mb-2" href="@Url.Action("CourseList", "Course")">Back to Course</a>
+<table class="table">
+    <thead>
+        <tr>
+            <th>ChapterId</th>
+            <th>CourseId</th>
+            <th>ChapterName</th>
+            <th>Index</th>
+            <th>Description</th>
+            <th>TotalTime</th>
+             </tr>
+    </thead>
+    <tbody>
+      @if (Model != null)
+{
+    foreach (var chapter in Model)
+    {
+        <tr>
+            <td>@chapter.ChapterId</td>
+            <td>@chapter.CourseId</td>
+            <td>@chapter.ChapterName</td>
+            <td>@chapter.Index</td>
+            <td>@chapter.Description</td>
+            <td>@chapter.TotalTime</td>    
+            <td>
+               <a class="btn btn-primary" href="@Url.Action("Index", "Lesson", new { chapterId = chapter.ChapterId, courseId = ViewBag.CourseId })">View Lesson</a>
+            </td>
+        </tr>
+    }
+}
+else
+{
+    <tr>
+        <td colspan="6">No chapters found.</td>
+    </tr>
+}
+    </tbody>
+
+    @section Scripts {
+        <partial name="_ValidationScriptsPartial" />
+    }
