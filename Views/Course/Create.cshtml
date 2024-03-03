@@ -1,0 +1,92 @@
+@model WebLibrary.Models.Course;
+
+@{
+    ViewData["Title"] = "Create";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<link rel="stylesheet" href="~/css/site.css" />
+<link rel="stylesheet" href="~/fonts/boxicons.css" />
+
+<div class="container-fluid mt-2 mb-3 p-0">
+    <div class="card mb-4 bg-theme">
+        <form asp-action="Create" class="ml-5 mt-3 mb-3" enctype="multipart/form-data">
+
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="mb-3 col-md-6">
+                        <div class="form-group">
+                            <label asp-for="CategoryId" class="text-theme font-weight-bold"></label>
+                            <select asp-for="CategoryId" asp-items="@ViewBag.CategoryList" class="form-control"
+                                style="width: 80%;">
+                                <option value="">-- Select Category --</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="mb-3 col-md-6">
+                        <div class="form-group">
+                            <label asp-for="CourseName" class="text-theme font-weight-bold"></label>
+                            <input asp-for="CourseName" class="form-control" style="width: 80%;" required
+                                data-val="true" data-val-required="Course name is required." />
+                            <span asp-validation-for="CourseName" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="mb-3 col-md-6">
+                        <div class="form-group">
+                            <label asp-for="Description" class="text-theme font-weight-bold"></label>
+                            <input asp-for="Description" class="form-control" style="width: 80%;" />
+                        </div>
+                    </div>
+                    <div class="mb-3 col-md-6">
+                        <div class="form-group">
+                            <label asp-for="Picture" class="text-theme font-weight-bold"></label>
+                            <input asp-for="Picture" name="picture" type="file" class="form-control"
+                                style="width: 80%;" />
+                        </div>
+                    </div>
+                    <div class="mb-3 col-md-6">
+                        <div class="form-group">
+                            <label asp-for="TotalTime" class="text-theme font-weight-bold"></label>
+                            <input asp-for="TotalTime" class="form-control" style="width: 80%;" />
+                        </div>
+                    </div>
+                    <div class="mb-3 col-md-6">
+                        <div class="form-group">
+                            <label asp-for="Price" class="text-theme font-weight-bold"></label>
+                            <input asp-for="Price" class="form-control" style="width: 80%;" />
+                        </div>
+                    </div>
+                    <div class="mb-3 col-md-6">
+                        <div class="form-group">
+                            <label asp-for="StartDate" class="text-theme font-weight-bold"></label>
+                            <input asp-for="StartDate" type="date" class="form-control" style="width: 80%;" />
+                            <span asp-validation-for="StartDate" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="mb-3 col-md-6">
+                        <div class="form-group">
+                            <label asp-for="EndDate" class="text-theme font-weight-bold"></label>
+                            <input asp-for="EndDate" type="date" class="form-control" style="width: 80%;" />
+                            <span asp-validation-for="EndDate" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="mb-3 col-md-6">
+                        <div class="form-group">
+                            <label asp-for="Status" class="text-theme font-weight-bold"></label>
+                            <select asp-for="Status" class="form-control" style="width: 80%;" />
+                            <option value="">Please select...</option>
+                            <option value="Active">Active</option>
+                            <option value="Inactive">Inactive</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-success mr-3">Create</button>
+            <a asp-action="CourseList" class="btn btn-secondary">Cancel</a>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

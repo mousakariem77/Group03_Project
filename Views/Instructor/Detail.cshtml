@@ -1,0 +1,99 @@
+@model WebLibrary.Models.Instructor;
+@{
+    ViewData["Title"] = "Detail";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<link rel="stylesheet" href="~/css/site.css" />
+<link rel="stylesheet" href="~/fonts/boxicons.css" />
+
+<div class="container-fluid mt-2 mb-3 p-0">
+    <div class="card mb-4 bg-theme">
+        <div class="card-body d-flex" style="justify-content: space-between;">
+            <div class="d-flex align-items-start align-items-sm-center gap-4 ml-5">
+                <div class="avatar-user mr-2 mt-5">
+                    <img class="avatar-initial rounded-circle bg-label-warning" src="~/img/1.png">
+                </div>
+                <div class="id-text form-group ml-2">
+                    <label asp-for="InstructorId" class="text-theme font-weight-bold"></label>
+                    <input asp-for="InstructorId" class="form-control" style="width: 80%;" disabled/>
+                </div>
+                <div class="btn-next mt-5 d-flex" >
+                    <form method="post" action="/Instructor/Previous">
+                        <input type="hidden" name="id" value="@Model.InstructorId" />
+                        <button type="submit" class="btn btn-primary text-white"><i class='bx bx-left-arrow-alt'></i></button>
+                    </form>
+                    <form class="ml-3" method="post" action="/Instructor/Next">
+                        <input type="hidden" name="id" value="@Model.InstructorId" />
+                        <button type="submit" class="btn btn-primary text-white"><i class='bx bx-right-arrow-alt'></i></button>
+                    </form> 
+                </div>
+            </div>
+        </div>
+        <div class="container-fluid ml-5">
+            <div class="row">
+                <div class="mb-3 col-md-6">
+                    <div class="form-group">
+                        <label asp-for="FirstName" class="text-theme font-weight-bold"></label>
+                        <input asp-for="FirstName" class="form-control" style="width: 80%;" disabled/>
+                    </div>
+                </div>
+                <div class="mb-3 col-md-6">
+                    <div class="form-group">
+                        <label asp-for="LastName" class="text-theme font-weight-bold"></label>
+                        <input asp-for="LastName" class="form-control" style="width: 80%;" disabled/>
+                    </div>
+                </div>
+                <div class="mb-3 col-md-6">
+                    <div class="form-group">
+                        <label asp-for="Gender" class="text-theme font-weight-bold"></label>
+                        <input asp-for="Gender" class="form-control" style="width: 80%;" disabled/>
+                    </div>
+                </div>
+                <div class="mb-3 col-md-6">
+                    <div class="form-group">
+                        <label asp-for="Country" class="text-theme font-weight-bold"></label>
+                        <input asp-for="Country" class="form-control" style="width: 80%;" disabled/>
+                    </div>
+                </div>
+                <div class="mb-3 col-md-6">
+                    <div class="form-group">
+                        <label asp-for="Email" class="text-theme font-weight-bold"></label>
+                        <input asp-for="Email" class="form-control" style="width: 80%;" disabled/>
+                    </div>
+                </div>
+                <div class="mb-3 col-md-6">
+                    <div class="form-group">
+                        <label asp-for="PhoneNumber" class="text-theme font-weight-bold"></label>
+                        <input asp-for="PhoneNumber" class="form-control" style="width: 80%;" disabled/>
+                    </div>
+                </div>
+                <div class="mb-3 col-md-6">
+                    <div class="form-group">
+                        <label asp-for="Birthday" class="text-theme font-weight-bold"></label>
+                        <input value="@Model.Birthday.Value.ToShortDateString()" asp-format="{0:dd-MM-yyyy}" class="form-control" style="width: 80%;" disabled/>
+                    </div>
+                </div>
+                <div class="mb-3 col-md-6">
+                    <div class="form-group">
+                        <label asp-for="RegistrationDate" class="text-theme font-weight-bold"></label>
+                        <input value="@Model.RegistrationDate.Value.ToShortDateString()"  class="form-control" style="width: 80%;" disabled/>
+                    </div>
+                </div>
+                <div class="mb-3 col-md-6">
+                    <div class="form-group">
+                        <label asp-for="Introduce" class="text-theme font-weight-bold"></label>
+                        <textarea asp-for="Introduce" class="form-control" style="width: 80%;" rows="4" disabled></textarea>
+                    </div>
+                </div>
+                <div class="mb-3 col-md-6">
+                    <div class="form-group">
+                        <label asp-for="Status" class="text-theme font-weight-bold"></label>
+                        <input asp-for="Status" class="form-control" style="width: 80%;" disabled/>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <a asp-action="Index" class="btn btn-secondary ml-5 mb-5" style="width: 8rem;">Back</a>
+    </div>
+</div>
+
