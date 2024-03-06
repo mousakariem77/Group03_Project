@@ -17,10 +17,20 @@ namespace Project_Group3.Controllers
         IInstructorRepository instructorRepository = null;
         ICourseRepository courseRepository = null;
         ICategoryRepository categoryRepository = null;
+        IInstructRepository instructRepository = null;
+        ILearnerRepository learnerRepository = null;
+        IReviewRepository reviewRepository = null;
+        ILessonRepository lessonRepository = null;
+        IChapterRepository chapterRepository = null;
         public HomeController() {
             courseRepository = new CourseRepository();
             categoryRepository = new CategoryRepository();
             instructorRepository = new InstructorRepository();
+            instructRepository = new InstructRepository();
+            learnerRepository = new LearnerRepository();
+            reviewRepository = new ReviewRepository();
+            lessonRepository = new LessonRepository();
+            chapterRepository = new ChapterRepository();
         } 
             
 
@@ -41,27 +51,113 @@ namespace Project_Group3.Controllers
             return View();
         }
 
-        public IActionResult Course()
+        public IActionResult Course(string search)
         {
             var course = courseRepository.GetCourses();
             var category = categoryRepository.GetCategorys();
+            var instruct = instructRepository.GetInstructs();
+            var instructor = instructorRepository.GetInstructors();
+            var review = reviewRepository.GetReviews();
             var courseList = course.ToList();
             var categoryList = category.ToList();
-            return View(Tuple.Create(courseList, categoryList));
+            var instructList = instruct.ToList();
+            var instructorList = instructor.ToList();
+            var reviewList = review.ToList();
+
+            if (!string.IsNullOrEmpty(search))
+            {
+                string lowercaseSearch = search.ToLower();
+                courseList = courseList.Where(c => c.CourseName.ToLower().Contains(lowercaseSearch)).ToList();
+                ViewBag.search = search;
+            }
+
+            return View(Tuple.Create(courseList, categoryList, instructList, instructorList, reviewList));
         }
         
         public IActionResult Contact()
         {
             // TODO: Your code here
-            return View();
+            return View(); 
         }
 
-        public IActionResult Infomation()
+        public IActionResult Profile(int? id)
         {
-            // TODO: Your code here
+            var role = Request.Cookies["Role"];
+            System.Console.WriteLine("role"+ role);
+            if(id == null){
+                return NotFound();
+            }
+            if(role == "0"){
+                var learner = learnerRepository.GetLearnerByID(id.Value);
+                var instructor = instructorRepository.GetInstructorByID(id.Value);
+                    if(instructor == null){
+                        return NotFound();
+                    }
+                    ViewBag.Role = "instructor";
+
+                return View(Tuple.Create(instructor, learner));
+            }else if(role == "1"){
+                var learner = learnerRepository.GetLearnerByID(id.Value);
+                var instructor = instructorRepository.GetInstructorByID(id.Value);
+                
+                    if(learner == null){
+                        return NotFound();
+                    }
+                    ViewBag.Role = "learner";
+
+                return View(Tuple.Create(instructor, learner));
+            }
             return View();
         }
         
+        public IActionResult CourseDetail(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+            var instruct = instructRepository.GetInstructByID(id.Value);
+            if (instruct== null)
+            {
+                return NotFound();
+            }
+            var courseId = TempData["CourseId"] as string;
+            var course = courseRepository.GetCourses();
+            var instructor = instructorRepository.GetInstructors();
+            var review = reviewRepository.GetReviews();
+            var learner = learnerRepository.GetLearners();
+            var chapter = chapterRepository.GetChapters();
+            var lesson = lessonRepository.GetLessons();
+            
+            var courseInfo = course.FirstOrDefault(c => c.CourseId == instruct.CourseId);
+            var instructorInfo = instructor.FirstOrDefault(i => i.InstructorId == instruct.InstructorId);
+
+            return View(Tuple.Create(courseInfo, instructorInfo, review, learner, chapter, lesson));
+        }        
+
+        public IActionResult Learning(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+            var course = courseRepository.GetCourseByID(id.Value);
+            if (course== null)
+            {
+                return NotFound();
+            }
+
+            var chapter = chapterRepository.GetChapters();
+            var lesson = lessonRepository.GetLessons();
+            return View(Tuple.Create(course, chapter, lesson));
+        }
+        
+        public IActionResult CheckOut(int? id)
+        {
+            var learner = learnerRepository.GetLearnerByID(id.Value);
+
+            return View(learner);
+        }
         
     }
 }

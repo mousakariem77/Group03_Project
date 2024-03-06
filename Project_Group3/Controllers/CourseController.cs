@@ -13,12 +13,35 @@ namespace Project_Group3.Controllers
     public class CourseController : Controller
     {
     
-         CourseRepository coureseRepository = null;
-        public CourseController() => coureseRepository = new CourseRepository();
-
-        public IActionResult Index(string search = "", int page = 1, int pageSize = 5)
+        ICourseRepository courseRepository = null;
+        ICategoryRepository categoryRepository = null;
+        IChapterRepository chapterRepository = null;
+        ILessonRepository lessonRepository = null;
+        IInstructorRepository instructorRepository = null;
+        IInstructRepository instructRepository = null;
+        public CourseController()
         {
-            var courseList = coureseRepository.GetCourses();
+            courseRepository = new CourseRepository();
+            categoryRepository = new CategoryRepository();
+            chapterRepository = new ChapterRepository();
+            lessonRepository = new LessonRepository();
+            instructorRepository = new InstructorRepository();
+            instructRepository = new InstructRepository();
+        }
+
+        public IActionResult Index(int id, string search = "", int page = 1, int pageSize = 4)
+        {
+            var courseList = courseRepository.GetCourses();
+            var chapterList = chapterRepository.GetChapters();
+            var categoryList = categoryRepository.GetCategorys();
+            var instruct = instructRepository.GetInstructs();
+
+            var instructor = instructorRepository.GetInstructorByID(id);
+            if (instructor == null)
+            {
+                return NotFound();
+
+            }
 
             if (!string.IsNullOrEmpty(search))
             {
@@ -35,14 +58,10 @@ namespace Project_Group3.Controllers
             ViewBag.TotalPages = totalPages;
             ViewBag.Quantity = totalCount;
             ViewBag.CurrentPage = page;
-            return View(courseList);
+            return View(Tuple.Create(courseList, chapterList, categoryList, instructor, instruct));
         }
 
-        public IActionResult CourseList()
-        {
-            var courseList = coureseRepository.GetCourses();
-            return View(courseList);
-        }
+
         
         public ActionResult Detail(int? id)
         {
@@ -50,13 +69,17 @@ namespace Project_Group3.Controllers
             {
                 return NotFound();
             }
-            var Course= coureseRepository.GetCourseByID(id.Value);
-            if (Course== null)
+            var course= courseRepository.GetCourseByID(id.Value);
+            var chapterList = chapterRepository.GetChapters();
+            var lessonList = lessonRepository.GetLessons();
+            var categoryList = categoryRepository.GetCategorys();
+            var instruct = instructRepository.GetInstructs();
+            if (course== null)
             {
                 return NotFound();
 
             }
-            return View(Course);
+            return View(Tuple.Create(course, chapterList, categoryList, instruct, lessonList));
         }
   
         public ActionResult Create() => View();
@@ -69,7 +92,7 @@ namespace Project_Group3.Controllers
             {
                 if (ModelState.IsValid)
                 {
-                    coureseRepository.InsertCourse(course);
+                    courseRepository.InsertCourse(course);
 
                 }
                 return RedirectToAction(nameof(Index));
@@ -82,13 +105,21 @@ namespace Project_Group3.Controllers
 
         }
 
+        
+        // public IActionResult Edit(int id)
+        // {
+        //   System.Console.WriteLine(id);
+        //     return View();
+        // }
+        
+        
         public ActionResult Edit(int? id)
         {
             if (id == null)
             {
                 return NotFound();
             }
-            var Course= coureseRepository.GetCourseByID(id.Value);
+            var Course= courseRepository.GetCourseByID(id.Value);
             if (Course== null)
             {
                 return NotFound();
@@ -108,7 +139,7 @@ namespace Project_Group3.Controllers
                 }
                 if (ModelState.IsValid)
                 {
-                    coureseRepository.UpdateCourse(course);
+                    courseRepository.UpdateCourse(course);
                 }
                 return RedirectToAction(nameof(Index));
             }
@@ -125,7 +156,7 @@ namespace Project_Group3.Controllers
             {
                 return NotFound();
             }
-            var course= coureseRepository.GetCourseByID(id.Value);
+            var course= courseRepository.GetCourseByID(id.Value);
             if (course== null)
             {
                 return NotFound();
@@ -139,7 +170,7 @@ namespace Project_Group3.Controllers
         {
             try
             {
-                coureseRepository.DeleteCourse(id);
+                courseRepository.DeleteCourse(id);
                 return RedirectToAction(nameof(Index));
             }
             catch (Exception ex)

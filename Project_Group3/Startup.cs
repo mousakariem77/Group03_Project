@@ -9,6 +9,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Project_Group3.Controllers;
+using Project_Group3.Service;
 
 namespace Project_Group3
 {
@@ -26,6 +27,13 @@ namespace Project_Group3
         {
             services.AddTransient<CourseController>();
             services.AddControllersWithViews();
+            services.AddSession(                   // Đăng ký dịch vụ session 
+                session =>
+                {
+                    session.Cookie.Name = "Project"; // Đặt tên Session - tên này sử dụng ở Browser (Cookie)
+                    session.IdleTimeout = TimeSpan.FromHours(24);
+                });
+            services.AddSingleton<IVnpayService,VnPayservice>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -45,7 +53,7 @@ namespace Project_Group3
             app.UseStaticFiles();
 
             app.UseRouting();
-
+            app.UseSession();   // Đăng ký Middleware Session vào Pipeline
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>

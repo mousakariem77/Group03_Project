@@ -118,7 +118,7 @@ namespace Project_Group3.Controllers
             }
             return View(instructor);
         }
-        //Post  instructorcontroller/edit/5
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult Edit(int id, Instructor instructor)
@@ -167,5 +167,12 @@ namespace Project_Group3.Controllers
                 return View();
             }
         }
+
+        public IActionResult Voucher()
+        {
+            // TODO: Your code here
+            return View();
+        }
+        
     }
 }

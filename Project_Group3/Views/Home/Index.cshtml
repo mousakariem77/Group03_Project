@@ -1,6 +1,6 @@
 ﻿@model Tuple<List<WebLibrary.Models.Category>, List<WebLibrary.Models.Instructor>>;
 @{
-    ViewData["Title"] = "Course";
+    ViewData["Title"] = "Home";
     Layout = "~/Views/Shared/_LayoutHome.cshtml";
 }
 <link rel="stylesheet" href="~/css/site.css" />
@@ -71,36 +71,60 @@
     <div class="container-fluid bg-registration p-0 mt-4">
         <div class="container py-5">
             <div class="row align-items-center">
-                <div class="col-lg-7 mb-5 mb-lg-0">
-                    <div class="mb-4">
-                        <h5 class="text-primary text-uppercase mb-3" style="letter-spacing: 5px;">WELCOME TO OUR COURSES
-                        </h5>
-                        <h1 class="text-white">30% Off For New Students</h1>
-                    </div>
-                    <p class="text-white">Take advantage of our special offer! New students can enjoy a 30% discount on
-                        any course they enroll in. Don't miss this opportunity to invest in your education at a
-                        discounted price.</p>
-                    <h5 class="text-primary text-uppercase mb-3" style="letter-spacing: 5px;">Why Choose Us?</h5>
+                @{
+                    var myCookieValue = Context.Request.Cookies["MyCookie"];
+                    if(myCookieValue == null){
+                        <div class="col-lg-7 mb-5 mb-lg-0">
+                            <div class="mb-4">
+                                <h5 class="text-primary text-uppercase mb-3" style="letter-spacing: 5px;">WELCOME TO OUR COURSES
+                                </h5>
+                                <h1 class="text-white">30% Off For New Students</h1>
+                            </div>
+                            <p class="text-white">Take advantage of our special offer! New students can enjoy a 30% discount on
+                                any course they enroll in. Don't miss this opportunity to invest in your education at a
+                                discounted price.</p>
+                            <h5 class="text-primary text-uppercase mb-3" style="letter-spacing: 5px;">Why Choose Us?</h5>
 
-                    <ul class="list-inline text-white m-0">
-                        <li class="py-2"><i class="fa fa-check text-primary mr-3"></i>Experienced Instructors</li>
-                        <li class="py-2"><i class="fa fa-check text-primary mr-3"></i>Comprehensive Curriculum</li>
-                        <li class="py-2"><i class="fa fa-check text-primary mr-3"></i>Flexible Learning</li>
-                        <li class="py-2"><i class="fa fa-check text-primary mr-3"></i>Interactive Learning Environment
-                        </li>
-                    </ul>
-                </div>
+                            <ul class="list-inline text-white m-0">
+                                <li class="py-2"><i class="fa fa-check text-primary mr-3"></i>Experienced Instructors</li>
+                                <li class="py-2"><i class="fa fa-check text-primary mr-3"></i>Comprehensive Curriculum</li>
+                                <li class="py-2"><i class="fa fa-check text-primary mr-3"></i>Flexible Learning</li>
+                                <li class="py-2"><i class="fa fa-check text-primary mr-3"></i>Interactive Learning Environment
+                                </li>
+                            </ul>
+                        </div>
 
-                <div class="col-lg-5">
-                    <div class=" border-0">
-                        <div class=" text-end">
-                            <a href="register.html" class="btn btn-register">Sign Up Now</a>
+                        <div class="col-lg-5">
+                            <div class=" border-0">
+                                <div class=" text-end">
+                                    <a asp-controller="User" asp-action="Register" class="btn btn-register">Sign Up Now</a>
+                                </div>
+                                <div class="card-body rounded-bottom">
+                                    <img class="img-fluid" src="~/img/avatars/birdEdu.png" alt="">
+                                </div>
+                            </div>
                         </div>
-                        <div class="card-body rounded-bottom">
-                            <img class="img-fluid" src="~/img/avatars/birdEdu.png" alt="">
+
+                    }else{
+                        <div class="col-lg-12 mb-12 mb-lg-0">
+                            <div class="mb-4">
+                                <h5 class="text-primary text-uppercase mb-3" style="letter-spacing: 5px;">WELCOME TO OUR COURSES</h5>
+                                <h1 class="text-white">30% Off For New Students</h1>
+                            </div>
+                            <p class="text-white">Take advantage of our special offer! New students can enjoy a 30% discount on any course they enroll in. Don't miss this opportunity to invest in your education at a discounted price.</p>
+                            <h5 class="text-primary text-uppercase mb-3" style="letter-spacing: 5px;">Why Choose Us?</h5>
+                            <ul class="list-inline text-white m-0">
+                                <li class="py-2"><i class="fa fa-check text-primary mr-3"></i>Experienced Instructors</li>
+                                <li class="py-2"><i class="fa fa-check text-primary mr-3"></i>Comprehensive Curriculum</li>
+                                <li class="py-2"><i class="fa fa-check text-primary mr-3"></i>Flexible Learning</li>
+                                <li class="py-2"><i class="fa fa-check text-primary mr-3"></i>Interactive Learning Environment</li>
+                                <li class="py-2"><i class="fa fa-check text-primary mr-3"></i>24/7 Access to Course Materials</li>
+                                <li class="py-2"><i class="fa fa-check text-primary mr-3"></i>Engaging Learning Activities</li>
+                                <li class="py-2"><i class="fa fa-check text-primary mr-3"></i>Supportive Online Community</li>
+                            </ul>
                         </div>
-                    </div>
-                </div>
+                    }
+                }
                 
             </div>
         </div>

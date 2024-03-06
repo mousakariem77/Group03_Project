@@ -106,7 +106,7 @@
                                     </div>
                                 </div>
                                 <div class="d-flex flex-column">
-                                    <a href="/learner/detail/@learner.LearnerId">
+                                    <a href="/admin/userDetail/@learner.LearnerId?role=learner">
                                         <span class="text-truncate text-theme">@learner.FirstName @learner.LastName</span><br>
                                         <small class="text-truncate text-muted text-theme">@learner.Email</small>
                                     </a>
@@ -115,24 +115,24 @@
                         </td>
                         <td class="text-theme">@learner.Gender</td>
                         <td class="text-theme">@learner.Country</td>
-                        <td class="text-theme">@learner.RegistrationDate.Value.ToShortDateString()</td>
+                        <td class="text-theme">@learner.RegistrationDate</td>
                         <td>
                             <span class="badge bg-label-success text-theme">@learner.Status</span>
                         </td>
                         <td class="text-theme">
                             <div class="action-icon d-flex text-center">
-                                <a class="btn btn-warning mr-2" asp-action="Edit" asp-route-id="@learner.LearnerId" title="Edit">
+                                <a class="btn btn-warning mr-2" href="/admin/userEdit/@learner.LearnerId?role=learner" title="Edit">
                                     <i class='bx bxs-edit'></i>
                                 </a>
-                                 @if(!(learner.Status.Equals("Delete"))){
+                                 @* @if(!(learner.Status.Equals("Delete"))){
                                     <a class="btn text-theme" style="background-color: rgb(169, 140, 140); cursor: pointer;" data-bs-toggle="modal" data-bs-target="#deleteModal">
                                         <i class='bx bxs-trash-alt'></i>
                                     </a>
                                 }else{
-                                    <a class="btn btn-danger" asp-action="Delete" asp-route-id="@learner.LearnerId" title="Delete">
+                                } *@
+                                    <a class="btn btn-danger" asp-action="DeleteLearner" asp-route-id="@learner.LearnerId" title="Delete">
                                         <i class='bx bxs-trash-alt'></i>
                                     </a>
-                                }
                             </div>
                         </td>
                     </tr>

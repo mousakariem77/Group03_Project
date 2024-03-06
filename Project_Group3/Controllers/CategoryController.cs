@@ -13,9 +13,9 @@ namespace Project_Group3.Controllers
     public class CategoryController : Controller
     {
       
-         CategoryRepository categoryRepository = null;
+        CategoryRepository categoryRepository = null;
         public CategoryController() => categoryRepository = new CategoryRepository();
-        //Get LearnerController
+
         public ActionResult Index()
         {
             var Categorylist = categoryRepository.GetCategorys();
@@ -35,9 +35,9 @@ namespace Project_Group3.Controllers
             }
             return View(Category);
         }
-        //Get Learnercontroller/Create  
+
         public ActionResult Create() => View();
-        //Post: Learnercontroller/ Create
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult Create(Category Category)
@@ -58,7 +58,6 @@ namespace Project_Group3.Controllers
             }
 
         }
-        //Get CoureseController/Edit/5
 
         public ActionResult Edit(int? id)
         {
@@ -73,7 +72,7 @@ namespace Project_Group3.Controllers
             }
             return View(Category);
         }
-        //Post  Learnercontroller/edit/5
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult Edit(int id, Category Category)
@@ -97,7 +96,7 @@ namespace Project_Group3.Controllers
 
             }
         }
-        //Get LearnerController/Delete/5
+
         public ActionResult Delete(int? id)
         {
             if (id == null)
@@ -111,7 +110,7 @@ namespace Project_Group3.Controllers
             }
             return View(Category);
         }
-        //Post Learnercontroller/delete/5
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult Delete(int id)
