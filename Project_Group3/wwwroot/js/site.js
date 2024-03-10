@@ -136,9 +136,33 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Show more
 function toggleButtonText(button) {
-  if (button.innerText === "Show more") {
-      button.innerText = "Show less";
+  if (button.innerText === "See more") {
+      button.innerText = "See less";
   } else {
-      button.innerText = "Show more";
+      button.innerText = "See more";
   }
+}
+
+// Information
+function showContent(contentId) {
+  // Ẩn tất cả các nội dung
+  hideAllContent();
+
+  // Hiển thị nội dung tương ứng với contentId
+  var content = document.getElementById(contentId);
+  content.style.display = "block";
+}
+
+function hideAllContent() {
+  // Ẩn tất cả các nội dung
+  var contents = document.getElementsByClassName("content");
+  for (var i = 0; i < contents.length; i++) {
+      contents[i].style.display = "none";
+  }
+}
+
+//Đánh sao
+function rateStar(rating) {
+  document.getElementById("rating").value = rating;
+  // Hãy thêm các xử lý tương ứng khác nếu cần
 }

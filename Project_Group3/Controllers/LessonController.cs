@@ -97,7 +97,7 @@ namespace Project_Group3.Controllers
 
             }
         }
-        //Get LearnerController/Delete/5
+        
         public ActionResult Delete(int? id)
         {
             if (id == null)
