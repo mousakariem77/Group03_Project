@@ -40,25 +40,31 @@ namespace Project_Group3.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Create(Review review)
+        public ActionResult Create(Review Review)
         {
+            var cookieValue = Request.Cookies["ID"];
+            var courseID = Review.CourseId;
             try
             {
                 if (ModelState.IsValid)
                 {
-                    review.LearnerId = 3; // Lấy giá trị LearnerID từ hidden field
-                    review.CourseId = review.CourseId; // Lấy giá trị CourseID từ hidden field
-                    reviewRepository.InsertReview(review);
-                }
+                    Review.LearnerId = int.Parse(cookieValue);
+                    Review.ReviewDate = DateTime.Now;
+                     int? rating = Review.Rating;
 
-                TempData["CourseId"] = review.CourseId;
-                return RedirectToAction("CourseDetail", "Home", new { id = review.CourseId });
+                    reviewRepository.InsertReview(Review);
+                    ViewBag.SuccessMessage = "Đánh giá đã được gửi thành công.";
+                    // Hoặc có thể chuyển hướng đến một trang thành công
+                    return RedirectToAction("CourseDetail", "Home", new { id = courseID });
+                }
             }
             catch (Exception ex)
             {
-                ViewBag.Message = ex.Message;
-                return View(review);
+                ViewBag.ErrorMessage = "Đã xảy ra lỗi: " + ex.Message;
             }
+
+            // Nếu có lỗi xảy ra hoặc dữ liệu không hợp lệ, hiển thị lại form
+            return View(Review);
         }
 
         public ActionResult Edit(int? id)

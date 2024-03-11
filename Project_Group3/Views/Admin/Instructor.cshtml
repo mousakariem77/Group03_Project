@@ -37,34 +37,8 @@
 <div class="card bg-theme p-0 mt-2 mb-5" >
     <div class="container no-footer mt-5 mb-3 p-0">
         <div class="row">
-            <div class="col-sm-12 col-md-2">
-                <div class="dataTables_length d-flex text-theme">
-                    <label>Show</label>
-                    <select name="pageSize" class="form-select" style="border-radius: 8px;">
-                        <option value="7">7</option>
-                        <option value="10">10</option>
-                        <option value="25">25</option>
-                        <option value="50">50</option>
-                        <option value="75">75</option>
-                        <option value="100">100</option>
-                    </select> 
-                    <label>entries</label>
-                </div>
-            </div>
-            <div class="col-sm-12 col-md-4">
-                <div class="dataTables_length d-flex text-theme">
-                    <label>Status</label>
-                    <select name="filter" class="form-select" style="border-radius: 8px;" 
-                        onchange="location.href = '/instructor/index?filter=' + this.value;">
-                        <option value="">All countries</option>
-                        <option value="Vietnam">Vietnam</option>
-                        <option value="Italya">Italya</option>
-                        <option value="Thailan">Thailan</option>
-                    </select>
-                </div>
-            </div>
             <div class="col-sm-12 col-md-6">
-                <div class="container-fluid ml-5">
+                <div class="container-fluid">
                     <form class="table-search d-flex" action="/instructor/index">
                         <input class="form-control" value="@ViewBag.search" type="search" name="search" placeholder="Search">
                         <button class="btn btn-primary btn-outline-primary ml-2" type="submit">
@@ -72,9 +46,6 @@
                         </button>
                     </form>
                 </div>
-            </div>
-            <div class="col-sm-12 col-md-3 mt-3">
-                <a class="btn btn-success" asp-action="Create">Add new</a>
             </div>
         </div>
     </div>
@@ -121,18 +92,20 @@
                         </td>
                         <td class="text-theme">
                             <div class="action-icon d-flex text-center">
-                                <a class="btn btn-warning mr-2" href="/admin/userEdit/@instructor.InstructorId?role=instructor" title="Edit">
+                                <a class="btn btn-warning mr-2" href="/instructor/edit/@instructor.InstructorId" title="Edit">
                                     <i class='bx bxs-edit'></i>
                                 </a>
-                                @* @if(!(instructor.Status.Equals("Delete"))){
-                                    <a class="btn text-theme" style="background-color: rgb(169, 140, 140); cursor: pointer;" data-bs-toggle="modal" data-bs-target="#deleteModal">
-                                        <i class='bx bxs-trash-alt'></i>
-                                    </a>
-                                }else{
-                                } *@
-                                    <a class="btn btn-danger" asp-action="DeleteInstructor" asp-route-id="@instructor.InstructorId" title="Delete">
-                                        <i class='bx bxs-trash-alt'></i>
-                                    </a>
+                                @{
+                                    if(instructor.Status != "Delete"){
+                                        <a class="btn text-theme" style="background-color: rgb(169, 140, 140); cursor: pointer;" data-bs-toggle="modal" data-bs-target="#deleteModal">
+                                            <i class='bx bxs-trash-alt'></i>
+                                        </a>
+                                    }else{
+                                        <a class="btn btn-danger" href="/learner/delete/@instructor.InstructorId" asp-route-id="@instructor.InstructorId" title="Delete">
+                                            <i class='bx bxs-trash-alt'></i>
+                                        </a>
+                                    }
+                                }
                             </div>
                         </td>
                     </tr>

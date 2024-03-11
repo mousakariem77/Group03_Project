@@ -161,3 +161,8 @@ function hideAllContent() {
   }
 }
 
+//Đánh sao
+function rateStar(rating) {
+  document.getElementById("rating").value = rating;
+  // Hãy thêm các xử lý tương ứng khác nếu cần
+}

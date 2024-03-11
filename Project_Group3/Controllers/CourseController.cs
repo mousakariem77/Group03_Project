@@ -52,7 +52,7 @@ namespace Project_Group3.Controllers
             var totalCount = courseList.Count();
             var totalPages = (int)Math.Ceiling((double)totalCount / pageSize);
 
-            courseList = courseList.Skip((page - 1) * pageSize).Take(pageSize).ToList();
+            // courseList = courseList.Skip((page - 1) * pageSize).Take(pageSize).ToList();
 
             ViewBag.PageSize = pageSize;
             ViewBag.TotalPages = totalPages;

@@ -136,7 +136,6 @@ D:\Group03_Project\Project_Group3\obj\Debug\net5.0\Project_Group3.RazorCoreGener
 D:\Group03_Project\Project_Group3\obj\Debug\net5.0\Razor\Views\Home\Index.cshtml.g.cs
 D:\Group03_Project\Project_Group3\obj\Debug\net5.0\Razor\Views\Instructor\Create.cshtml.g.cs
 D:\Group03_Project\Project_Group3\obj\Debug\net5.0\Razor\Views\Instructor\Delete.cshtml.g.cs
-D:\Group03_Project\Project_Group3\obj\Debug\net5.0\Razor\Views\Instructor\Edit.cshtml.g.cs
 D:\Group03_Project\Project_Group3\obj\Debug\net5.0\Razor\Views\Shared\Error.cshtml.g.cs
 D:\Group03_Project\Project_Group3\obj\Debug\net5.0\Razor\Views\Shared\_Layout.cshtml.g.cs
 D:\Group03_Project\Project_Group3\obj\Debug\net5.0\Razor\Views\Shared\_ValidationScriptsPartial.cshtml.g.cs
@@ -197,3 +196,4 @@ D:\Group03_Project\Project_Group3\obj\Debug\net5.0\Razor\Views\Home\CourseDetail
 D:\Group03_Project\Project_Group3\obj\Debug\net5.0\Razor\Views\Course\Create.cshtml.g.cs
 D:\Group03_Project\Project_Group3\obj\Debug\net5.0\Razor\Views\Course\Index.cshtml.g.cs
 D:\Group03_Project\Project_Group3\obj\Debug\net5.0\Razor\Views\Shared\_LayoutCourse.cshtml.g.cs
+D:\Group03_Project\Project_Group3\obj\Debug\net5.0\Razor\Views\Instructor\Edit.cshtml.g.cs

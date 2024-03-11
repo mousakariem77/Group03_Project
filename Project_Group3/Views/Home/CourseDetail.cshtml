@@ -371,23 +371,34 @@
                 </div>
                 @{
                     if(role != null){
-                    <div class="star-feedback star-post">
-                            <div class="star-item mr-2 mb-2 ml-5 mt-2">
-                                <i class="bx bxs-star text-white"></i>
-                                <i class="bx bxs-star text-white"></i>
-                                <i class="bx bxs-star text-white"></i>
-                                <i class="bx bxs-star text-white"></i>
-                                <i class="bx bxs-star text-white"></i>
-                            </div>
-                        <div class="feedback-post">
-                            <form action="@Url.Action("Create", "Review")" method="post">
-                                <input type="hidden" name="CourseId" value="@Model.Item1.CourseId" />
-                                <input type="hidden" name="LearnerID" value="3" />
-                                <textarea name="Comment" rows="3" cols="40" class="outline-0 ml-3 mt-2" placeholder="Enter your feedback here"></textarea><br>
-                                <button class="btn btn-success float-right mr-5" type="submit">Send</button>
-                            </form>
+                        <div class="star-feedback star-post">
+                                <div class="star-item mr-2 mb-2 ml-5 mt-2">
+                                    <span class="star-item mr-2 mb-2 ml-5 mt-2 cursor-pointer" onclick="rateStar(1)">
+                                        <i class="bx bxs-star"></i>
+                                    </span>
+                                    <span class="star-item mr-2 mb-2" onclick="rateStar(2)">
+                                        <i class="bx bxs-star"></i>
+                                    </span>
+                                    <span class="star-item mr-2 mb-2" onclick="rateStar(3)">
+                                        <i class="bx bxs-star"></i>
+                                    </span>
+                                    <span class="star-item mr-2 mb-2" onclick="rateStar(4)">
+                                        <i class="bx bxs-star"></i>
+                                    </span>
+                                    <span class="star-item mr-2 mb-2" onclick="rateStar(5)">
+                                        <i class="bx bxs-star"></i>
+                                    </span>
+                                </div>
+                            <div class="feedback-post">
+                                <form action="@Url.Action("Create", "Review")" method="post">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="CourseID" value="@ViewBag.CourseID" />
+                                    <input type="hidden" name="Rating" id="rating" value="" />
+                                    <textarea name="Comment" rows="3" cols="40" class="outline-0 ml-3 mt-2" placeholder="Enter your feedback here"></textarea><br>
+                                    <button class="btn btn-success float-right mr-5" type="submit">Send</button>
+                                </form>
+                            </div> 
                         </div>
-                    </div>
                     }
                 }
             </div>
@@ -459,9 +470,9 @@
                                                     }
                                                 }
                                             }
+                                            <small class="mt-2 ml-4">@review.ReviewDate.Value.ToShortDateString()</small>
                                             <p>@review.Comment</p>
                                         </div>
-                                        <small class="mt-2 ml-2">@review.ReviewDate</small>
                                     </div>
                                     <hr>
                                 </li>
@@ -526,9 +537,9 @@
                                                     }
                                                 }
                                             }
+                                            <small class="mt-2 ml-4">@review.ReviewDate.Value.ToShortDateString()</small>
                                             <p>@review.Comment</p>
                                         </div>
-                                        <small class="mt-2 ml-2">@review.ReviewDate</small>
                                     </div>
                                     <hr>
                                 </li>
@@ -537,10 +548,14 @@
                     }
                 }
             </ul>
-            <div class="more-course mb-4 mt-4 ml-5">
-                <button type="button" class="btn btn-primary" data-bs-toggle="collapse" data-bs-target="#more"
-                onclick="toggleButtonText(this)">See more</button>
-            </div>
+            @{
+                if(count > 0){
+                    <div class="more-course mb-4 mt-4 ml-5">
+                        <button type="button" class="btn btn-primary" data-bs-toggle="collapse" data-bs-target="#more"
+                        onclick="toggleButtonText(this)">See more</button>
+                    </div>
+                }
+            }
         </div>
     </div>
 </div>

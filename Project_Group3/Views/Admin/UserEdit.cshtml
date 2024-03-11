@@ -15,10 +15,10 @@
         <form asp-action="UserEdit" asp-method="post" class="ml-5 mt-3 mb-3" enctype="multipart/form-data">
             <div class="card-body d-flex" style="justify-content: space-between;">
                 <div class="d-flex align-items-start align-items-sm-center gap-4 ml-5">
-                    <div class="avatar-user mr-2 mt-5">
-                        <img class="avatar-initial rounded-circle bg-label-warning" src="~/img/1.png">
+                    <div class=" mr-2 mt-5">
+                        <img class="avatar-initial rounded-circle bg-label-warning" src="~/img/1.png" style="width: 80%;">
                     </div>
-                    <div class="id-text form-group ml-2">
+                    <div class="id-text form-group">
                         @{
                             if(role.Equals("instructor")){
                                 <label class="text-theme font-weight-bold">InstructorId</label>
@@ -199,12 +199,12 @@
                 @if (role.Equals("instructor"))
                 {
                     <input type="hidden" name="id" value="@Model.Item1.InstructorId" />
-                    <a asp-action="Instructor" class="btn btn-secondary ml-3 mt-3 mb-5" style="width: 8rem;">Back</a>
+                    <a asp-action="Instructor" class="btn btn-secondary ml-3 mt-5 mb-5" style="width: 8rem;">Back</a>
                 }
                 else if (role.Equals("learner"))
                 {
                     <input type="hidden" name="id" value="@Model.Item2.LearnerId" />
-                    <a asp-action="Learner" class="btn btn-secondary ml-3 mt-3 mb-5" style="width: 8rem;">Back</a>
+                    <a asp-action="Learner" class="btn btn-secondary ml-3 mt-5 mb-5" style="width: 8rem;">Back</a>
                 }
             }
         </form>
