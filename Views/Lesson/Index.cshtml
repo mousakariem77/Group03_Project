@@ -2,6 +2,7 @@
 
 @{
     ViewData["Title"] = "Index";
+      Layout = "~/Views/Shared/_Login.cshtml";
 }
 
 <h1>List Lesson</h1>
@@ -10,9 +11,8 @@
 <table class="table">
     <thead>
         <tr>
-            <th>CourseId</th>
-            <th>ChapterId</th>
-            <th>LessonId</th>
+            <th>CourseName</th>
+            <th>ChapterName</th>
             <th>LessonName</th>
             <th>Description</th>
             <th>PercentToPassed</th>
@@ -29,9 +29,8 @@
             foreach (var lesson in Model)
             {
                 <tr>
-                    <td>@lesson.CourseId</td>
-                    <td>@lesson.ChapterId</td>
-                    <td>@lesson.LessonId</td>
+                    <td>@ViewBag.CourseName</td>
+                    <td>@ViewBag.ChapterName</td>
                     <td>@lesson.LessonName</td>
                     <td>@lesson.Description</td>
                     <td>@lesson.PercentToPassed</td>

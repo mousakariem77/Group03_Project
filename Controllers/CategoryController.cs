@@ -9,11 +9,11 @@ using WebLibrary.Models;
 using WebLibrary.Repository;
 namespace Project_Group3.Controllers
 {
-  
+
     public class CategoryController : Controller
     {
-      
-         CategoryRepository categoryRepository = null;
+
+        ICategoryRepository categoryRepository = null;
         public CategoryController() => categoryRepository = new CategoryRepository();
         //Get LearnerController
         public ActionResult Index()
@@ -27,8 +27,8 @@ namespace Project_Group3.Controllers
             {
                 return NotFound();
             }
-            var Category= categoryRepository.GetCategoryByID(id.Value);
-            if (Category== null)
+            var Category = categoryRepository.GetCategoryByID(id.Value);
+            if (Category == null)
             {
                 return NotFound();
 
@@ -66,8 +66,8 @@ namespace Project_Group3.Controllers
             {
                 return NotFound();
             }
-            var Category= categoryRepository.GetCategoryByID(id.Value);
-            if (Category== null)
+            var Category = categoryRepository.GetCategoryByID(id.Value);
+            if (Category == null)
             {
                 return NotFound();
             }
@@ -97,37 +97,40 @@ namespace Project_Group3.Controllers
 
             }
         }
-        //Get LearnerController/Delete/5
-        public ActionResult Delete(int? id)
+     public ActionResult Delete(int? id)
         {
             if (id == null)
             {
                 return NotFound();
             }
-            var Category= categoryRepository.GetCategoryByID(id.Value);
-            if (Category== null)
+            var category = categoryRepository.GetCategoryByID(id.Value);
+            if (category == null)
             {
                 return NotFound();
             }
-            return View(Category);
+            return View(category);
         }
-        //Post Learnercontroller/delete/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id)
-        {
-            try
-            {
-                categoryRepository.DeleteCategory(id);
-                return RedirectToAction(nameof(Index));
-            }
-            catch (Exception ex)
+        //Post carcontroller/delete/5
+      [HttpPost]
+[ValidateAntiForgeryToken]
+public ActionResult Delete(int id)
+{
+    try
+    {
+        categoryRepository.DeleteCategory(id);
+        return RedirectToAction(nameof(Index));
+    }
+    catch (Exception ex)
+    {
+        ViewBag.Message = "An error occurred while deleting the category.";
+        ViewBag.ErrorMessage = ex.Message;
+        ViewBag.StackTrace = ex.StackTrace;
+        ViewBag.InnerErrorMessage = ex.InnerException?.Message;
+        ViewBag.InnerStackTrace = ex.InnerException?.StackTrace;
 
-            {
-                ViewBag.Message = ex.Message;
-                return View();
-            }
-
-        }
+        var category = categoryRepository.GetCategoryByID(id);
+        return View(category);
+    }
+}
     }
 }

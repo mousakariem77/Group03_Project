@@ -14,65 +14,108 @@ namespace Project_Group3.Controllers
 {
     public class CourseController : Controller
     {
-        private CourseRepository courseRepository;
-        private CategoryRepository categoryRepository;
-        private ChapterRepository chapterRepository;
+          ICourseRepository courseRepository = null;
+         ICategoryRepository categoryRepository = null;
+        IChapterRepository chapterRepository = null;
+        ILessonRepository lessonRepository = null;
+
         public CourseController()
         {
             courseRepository = new CourseRepository();
             categoryRepository = new CategoryRepository();
             chapterRepository = new ChapterRepository();
+            lessonRepository = new LessonRepository();
         }
-        public IActionResult CourseList()
-        {
-            var courseList = courseRepository.GetCourses();
-            return View(courseList);
-        }
+     public IActionResult Index()
+{
+    var courseList = courseRepository.GetCourses();
+    var chapterList = chapterRepository.GetChapters();
+    var lessonList = lessonRepository.GetLessons();
 
-        public ActionResult Create()
-        {
+   var categorylist = categoryRepository.GetCategorys();
+ 
 
-            var categoryList = categoryRepository.GetCategorys();
-            ViewBag.CategoryList = new SelectList(categoryList, "CategoryId", "CategoryName");
+    var model = Tuple.Create(courseList, chapterList, lessonList, categorylist);
+    return View(model);
+}
+      public ActionResult Create()
+{
+    var categoryList = categoryRepository.GetCategorys();
+    ViewBag.CategoryList = new SelectList(categoryList, "CategoryId", "CategoryName");
 
-            return View();
-        }
+    return View();
+}
 
-      [HttpPost]
+[HttpPost]
 [ValidateAntiForgeryToken]
 public IActionResult Create(Course course, IFormFile picture)
 {
     try
     {
-        if (picture != null && picture.Length > 0)
-        {
-            // Xử lý tệp tin hình ảnh
-            var urlTuongDoi = "/img/courseImg/";
-            var urlTuyetDoi = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "img", "courseImg");
-            var fileName = Guid.NewGuid() + Path.GetExtension(picture.FileName);
-            var filePath = Path.Combine(urlTuyetDoi, fileName);
-
-            using (var stream = new FileStream(filePath, FileMode.Create))
-            {
-                picture.CopyTo(stream);
-            }
-            // Cập nhật đường dẫn hình ảnh mới vào thuộc tính tương ứng trong đối tượng Course
-            course.Picture = Path.Combine(urlTuongDoi, fileName);
-        }
-        
         if (ModelState.IsValid)
         {
-            // Kiểm tra các điều kiện khác
+            // Check other conditions
             if (course.StartDate > course.EndDate)
             {
+                ModelState.AddModelError("StartDate", "Start date must be earlier than end date.");
                 ModelState.AddModelError("EndDate", "End date must be later than start date.");
-                return View(course);
             }
-            
-            courseRepository.InsertCourse(course);
-            return RedirectToAction("Create", "Chapter", new { courseId = course.CourseId });
+
+            // Add conditions for additional properties
+            if (string.IsNullOrEmpty(course.CourseName))
+            {
+                ModelState.AddModelError("CourseName", "Course name is required.");
+            }
+
+            if (string.IsNullOrEmpty(course.Description))
+            {
+                ModelState.AddModelError("Description", "Description is required.");
+            }
+
+            if (picture == null || picture.Length == 0)
+            {
+                ModelState.AddModelError("Picture", "Picture is required.");
+            }
+
+            if (course.TotalTime == null)
+            {
+                ModelState.AddModelError("TotalTime", "Total time is required.");
+            }
+
+            if (course.Price == null)
+            {
+                ModelState.AddModelError("Price", "Price is required.");
+            }
+
+            if (string.IsNullOrEmpty(course.Status))
+            {
+                ModelState.AddModelError("Status", "Status is required.");
+            }
+
+            if (ModelState.IsValid)
+            {
+                // Handle the image file
+                var urlRelative = "/img/courseImg/";
+                var urlAbsolute = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "img", "courseImg");
+                var fileName = Guid.NewGuid() + Path.GetExtension(picture.FileName);
+                var filePath = Path.Combine(urlAbsolute, fileName);
+
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    picture.CopyTo(stream);
+                }
+
+                // Update the course object with the new image path
+                course.Picture = Path.Combine(urlRelative, fileName);
+
+                courseRepository.InsertCourse(course);
+                return RedirectToAction("Create", "Chapter", new { courseId = course.CourseId });
+            }
         }
 
+        ViewBag.CategoryId = course.CategoryId; // Truyền CategoryId vào ViewBag
+        var categoryList = categoryRepository.GetCategorys();
+        ViewBag.CategoryList = new SelectList(categoryList, "CategoryId", "CategoryName");
         return View(course);
     }
     catch (Exception ex)
@@ -81,7 +124,6 @@ public IActionResult Create(Course course, IFormFile picture)
         return View(course);
     }
 }
-
 
 
         public ActionResult Detail(int? id)
@@ -128,7 +170,7 @@ public IActionResult Create(Course course, IFormFile picture)
                 {
                     courseRepository.UpdateCourse(course);
                 }
-                return RedirectToAction(nameof(CourseList));
+                return RedirectToAction(nameof(Index));
             }
             catch (Exception ex)
             {

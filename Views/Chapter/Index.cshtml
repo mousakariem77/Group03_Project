@@ -1,39 +1,51 @@
-@model IEnumerable<WebLibrary.Models.Chapter>;
-
+@model Tuple<IEnumerable<WebLibrary.Models.Chapter>, IEnumerable<WebLibrary.Models.Lesson>>;
 @{
     ViewData["Title"] = "Index";
+       Layout = "~/Views/Shared/_Login.cshtml";
 }
-
-
 <h1>List Chaper</h1>
 <a class="btn btn-success mb-2" href="@Url.Action("Create", "Chapter", new { courseId = ViewBag.CourseId })">Add new Chapter</a>
-<a class="btn btn-success mb-2" href="@Url.Action("CourseList", "Course")">Back to Course</a>
+<a class="btn btn-success mb-2" href="@Url.Action("Index", "Course")">Back to Course</a>
+    <a class="btn btn-success mb-2" href="@Url.Action("Index", "Answer")">Answer</a>
 <table class="table">
     <thead>
         <tr>
-            <th>ChapterId</th>
-            <th>CourseId</th>
+            <th>CourseName</th> 
             <th>ChapterName</th>
             <th>Index</th>
             <th>Description</th>
             <th>TotalTime</th>
-             </tr>
+            <th>Total Lesson</th>
+        </tr>
     </thead>
     <tbody>
       @if (Model != null)
 {
-    foreach (var chapter in Model)
+    foreach (var chapter in Model.Item1)
     {
         <tr>
-            <td>@chapter.ChapterId</td>
-            <td>@chapter.CourseId</td>
+            <td>@ViewBag.CourseName </td>
             <td>@chapter.ChapterName</td>
             <td>@chapter.Index</td>
             <td>@chapter.Description</td>
             <td>@chapter.TotalTime</td>    
+            
+           @{
+                        int countlesson = 0;
+                        foreach(var lesson in Model.Item2){
+                            if(lesson.ChapterId == chapter.ChapterId){
+                                countlesson++;
+                            }
+                        }
+                    }
+         <td>@countlesson</td>
+            
             <td>
                <a class="btn btn-primary" href="@Url.Action("Index", "Lesson", new { chapterId = chapter.ChapterId, courseId = ViewBag.CourseId })">View Lesson</a>
             </td>
+                 <td>
+              <a class="btn btn-success mb-2" href="@Url.Action("Index", "Quiz", new { chapterId = chapter.ChapterId, courseId = ViewBag.CourseId })">Quiz</a>
+              </td>
         </tr>
     }
 }

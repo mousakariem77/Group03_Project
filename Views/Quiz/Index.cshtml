@@ -1,0 +1,64 @@
+@model Tuple<IEnumerable<WebLibrary.Models.Quiz>, IEnumerable<WebLibrary.Models.Answer>>;
+
+@{
+    ViewData["Title"] = "Index";
+      Layout = "~/Views/Shared/_Login.cshtml";
+}
+
+<h1>List Quiz</h1>
+@* <a class="btn btn-success mb-2" href="@Url.Action("Create", "Lesson", new { chapterId = ViewBag.ChapterId, courseId = ViewBag.CourseId })">Add new Lesson</a>
+<a class="btn btn-success mb-2" href="@Url.Action("Index", "Chapter", new { courseId = ViewBag.CourseId })">Back to Chapter</a> *@
+    <a class="btn btn-success mb-2" href="@Url.Action("Create", "Quiz", new { chapterId = ViewBag.ChapterId, courseId = ViewBag.CourseId })">add Quiz</a>
+        <a class="btn btn-success mb-2" href="@Url.Action("Index", "Chapter", new { courseId = ViewBag.CourseId })">Back to Chapter</a>
+<table class="table">
+    <thead>
+        <tr>
+             <th>CourseName</th>
+            <th>ChapterName</th>
+            <th>Quiz1</th>
+            <th>DapAnA</th>
+            <th>DapAnB</th>
+            <th>DapAnC</th>
+            <th>DapAnD</th>
+            <th>DapAn</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (Model != null)
+        {
+            foreach (var quiz in Model.Item1)
+            {
+                <tr>
+                    <td>@ViewBag.CourseName</td>
+                    <td>@ViewBag.ChapterName</td>
+                    <td>@quiz.Quiz1</td>
+                    <td>@quiz.DapAnA</td>
+                    <td>@quiz.DapAnB</td>
+                    <td>@quiz.DapAnC</td>
+                    <td>@quiz.DapAnD</td>
+                    <td>        @{     
+                        string answerName = "";
+                        foreach(var answer in Model.Item2){
+                            if(quiz.AnswerId == answer.AnswerId){
+                                answerName = answer.Answer1;
+                                break;
+                            }
+                        }
+        }
+        @answerName
+                    </td>
+                </tr>
+            }
+        }
+        else
+        {
+            <tr>
+                <td colspan="11">No Quiz found.</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
