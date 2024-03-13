@@ -14,20 +14,27 @@ namespace Project_Group3.Controllers
     public class LessonController : Controller
     {
 
-        private LessonRepository lessonRepository;
-        private ChapterRepository chapterRepository;
+        ILessonRepository lessonRepository = null;
+        IChapterRepository chapterRepository = null;
+        ICourseRepository courseRepository = null;
 
         public LessonController()
         {
             lessonRepository = new LessonRepository();
             chapterRepository = new ChapterRepository();
+            courseRepository = new CourseRepository();
         }
 
-        public ActionResult Index(int chapterId, int? courseId)
+        public ActionResult Index(int chapterId, int courseId)
         {
+
+            var chapter = chapterRepository.GetChapterByID(chapterId);
+            var course = courseRepository.GetCourseByID(courseId);
             ViewBag.CourseId = courseId;
             ViewBag.ChapterId = chapterId;
 
+            ViewBag.ChapterName = chapter.ChapterName;
+            ViewBag.CourseName = course.CourseName;
             // Lấy danh sách tất cả các chương từ repository
             var lessonList = lessonRepository.GetLessons();
 
@@ -56,41 +63,89 @@ namespace Project_Group3.Controllers
         public ActionResult Create(int chapterId, int courseId)
         {
             var chapter = chapterRepository.GetChapterByID(chapterId);
+            var course = courseRepository.GetCourseByID(courseId);
             ViewBag.ChapterId = chapterId;
             ViewBag.CourseId = courseId;
-            if (chapter == null)
-            {
-                ViewBag.ChapterName = "Unknown chapter";
-                ViewBag.err = "1";
-                return View();
-            }
-            else
-            {
-                if (string.IsNullOrEmpty(chapter.ChapterName))
-                {
-                    ViewBag.ChapterName = "Unknown chapter";
-                    ViewBag.err = "1";
-                    return View();
-                }
-                else
-                {
-                    ViewBag.ChapterName = chapter.ChapterName;
-                }
-            }
 
+            ViewBag.ChapterName = chapter.ChapterName;
+             ViewBag.CourseName = course.CourseName;
             return View();
         }
-        //Post: Learnercontroller/ Create
+
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create(Lesson lesson)
+        public ActionResult Create(Lesson lesson, int chapterId, int courseId)
         {
             try
             {
                 if (ModelState.IsValid)
                 {
-                    lessonRepository.InsertLesson(lesson);
-                    return RedirectToAction("Index", new { chapterId = lesson.ChapterId, courseId = lesson.CourseId });
+                    // Kiểm tra điều kiện cho thuộc tính LessonName
+                    if (!string.IsNullOrEmpty(lesson.LessonName))
+                    {
+                        // Kiểm tra điều kiện cho thuộc tính Description
+                        if (!string.IsNullOrEmpty(lesson.Description))
+                        {
+                            // Kiểm tra điều kiện cho thuộc tính PercentToPassed
+                            if (lesson.PercentToPassed.HasValue && lesson.PercentToPassed.Value >= 0 && lesson.PercentToPassed.Value <= 100)
+                            {
+                                // Kiểm tra điều kiện cho thuộc tính MustBeCompleted
+                                if (lesson.MustBeCompleted.HasValue)
+                                {
+                                    // Kiểm tra điều kiện cho thuộc tính Content
+                                    if (!string.IsNullOrEmpty(lesson.Content))
+                                    {
+                                        // Kiểm tra điều kiện cho thuộc tính Index
+                                        if (lesson.Index.HasValue && lesson.Index.Value > 0)
+                                        {
+                                            // Kiểm tra điều kiện cho thuộc tính Type
+                                            if (lesson.Type.HasValue)
+                                            {
+                                                // Kiểm tra điều kiện cho thuộc tính Time
+                                                if (lesson.Time.HasValue && lesson.Time.Value > 0)
+                                                {
+                                                    lessonRepository.InsertLesson(lesson);
+                                                    return RedirectToAction("Index", new { chapterId = chapterId, courseId = courseId });
+                                                }
+                                                else
+                                                {
+                                                    ModelState.AddModelError("Time", "Time must be a positive value.");
+                                                }
+                                            }
+                                            else
+                                            {
+                                                ModelState.AddModelError("Type", "Type is required.");
+                                            }
+                                        }
+                                        else
+                                        {
+                                            ModelState.AddModelError("Index", "Index must be a positive value.");
+                                        }
+                                    }
+                                    else
+                                    {
+                                        ModelState.AddModelError("Content", "Content is required.");
+                                    }
+                                }
+                                else
+                                {
+                                    ModelState.AddModelError("MustBeCompleted", "MustBeCompleted is required.");
+                                }
+                            }
+                            else
+                            {
+                                ModelState.AddModelError("PercentToPassed", "PercentToPassed must ,be a value between 0 and 100.");
+                            }
+                        }
+                        else
+                        {
+                            ModelState.AddModelError("Description", "Description is required.");
+                        }
+                    }
+                    else
+                    {
+                        ModelState.AddModelError("LessonName", "LessonName is required.");
+                    }
                 }
             }
             catch (Exception ex)
@@ -98,8 +153,11 @@ namespace Project_Group3.Controllers
                 Console.WriteLine("An error occurred: " + ex.Message);
                 ViewBag.Message = ex.Message;
             }
-
-            return View();
+            var chapter = chapterRepository.GetChapterByID(chapterId);
+            ViewBag.ChapterId = chapterId;
+            ViewBag.CourseId = courseId;
+            ViewBag.ChapterName = chapter.ChapterName;
+            return View(lesson);
         }
         //Get CoureseController/Edit/5
 

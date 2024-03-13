@@ -270,7 +270,6 @@ E:\Hong_Linh\Chay_Thu\Project_Group3\obj\Debug\net5.0\Project_Group3.genruntimec
 E:\Hong_Linh\Chay_Thu\Project_Group3\obj\Debug\net5.0\ref\Project_Group3.dll
 E:\Hong_Linh\Chay_Thu\Project_Group3\obj\Debug\net5.0\Razor\Views\Category\Index.cshtml.g.cs
 E:\Hong_Linh\Chay_Thu\Project_Group3\obj\Debug\net5.0\Razor\Views\Course\Create.cshtml.g.cs
-E:\Hong_Linh\Chay_Thu\Project_Group3\obj\Debug\net5.0\Razor\Views\Course\CourseList.cshtml.g.cs
 E:\Hong_Linh\Chay_Thu\Project_Group3\obj\Debug\net5.0\Razor\Views\Category\Create.cshtml.g.cs
 E:\Hong_Linh\Chay_Thu\Project_Group3\obj\Debug\net5.0\Razor\Views\Chapter\Create.cshtml.g.cs
 E:\Hong_Linh\Chay_Thu\Project_Group3\obj\Debug\net5.0\Razor\Views\Chapter\Index.cshtml.g.cs
@@ -283,3 +282,11 @@ E:\Hong_Linh\Chay_Thu\Project_Group3\bin\Debug\net5.0\Microsoft.Extensions.Loggi
 E:\Hong_Linh\Chay_Thu\Project_Group3\bin\Debug\net5.0\Microsoft.Extensions.Options.dll
 E:\Hong_Linh\Chay_Thu\Project_Group3\bin\Debug\net5.0\Microsoft.Extensions.Primitives.dll
 E:\Hong_Linh\Chay_Thu\Project_Group3\bin\Debug\net5.0\System.Runtime.CompilerServices.Unsafe.dll
+E:\Hong_Linh\Chay_Thu\Project_Group3\obj\Debug\net5.0\Project_Group3.sourcelink.json
+E:\Hong_Linh\Chay_Thu\Project_Group3\obj\Debug\net5.0\Razor\Views\Course\Index.cshtml.g.cs
+E:\Hong_Linh\Chay_Thu\Project_Group3\obj\Debug\net5.0\Razor\Views\Quiz\Create.cshtml.g.cs
+E:\Hong_Linh\Chay_Thu\Project_Group3\obj\Debug\net5.0\Razor\Views\Quiz\Index.cshtml.g.cs
+E:\Hong_Linh\Chay_Thu\Project_Group3\obj\Debug\net5.0\Razor\Views\Answer\Create.cshtml.g.cs
+E:\Hong_Linh\Chay_Thu\Project_Group3\obj\Debug\net5.0\Razor\Views\Answer\Index.cshtml.g.cs
+E:\Hong_Linh\Chay_Thu\Project_Group3\obj\Debug\net5.0\Razor\Views\Category\Delete.cshtml.g.cs
+E:\Hong_Linh\Chay_Thu\Project_Group3\obj\Debug\net5.0\Razor\Views\Category\Edit.cshtml.g.cs

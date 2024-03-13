@@ -1,0 +1,31 @@
+@model IEnumerable<WebLibrary.Models.Answer>
+@{
+    ViewBag.Title = "Answer";
+     Layout = "~/Views/Shared/_Login.cshtml";
+}
+
+<h1 class="text-warning text-center">Answer</h1>
+
+<a class="btn btn-success" asp-action="Create">Add Answer</a>
+<table class="table table-hover">
+    <thead>
+        <tr class="bg-dark text-white">
+            <th>ID</th>
+            <th>Answer</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var answer in Model)
+        {
+            <tr>
+                <td>@answer.AnswerId</td>
+                <td>@answer.Answer1</td>
+                <td>
+                    <a class="btn btn-primary" asp-action="Detail" asp-route-id="@answer.AnswerId">Detail</a>
+                    <a class="btn btn-warning" asp-action="Edit" asp-route-id="@answer.AnswerId">Edit</a>
+                    <a class="btn btn-danger" asp-action="Delete" asp-route-id="@answer.AnswerId">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>

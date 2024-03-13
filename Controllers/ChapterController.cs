@@ -13,27 +13,33 @@ namespace Project_Group3.Controllers
 
     public class ChapterController : Controller
     {
-        private CourseRepository courseRepository;
-        private ChapterRepository chapterRepository;
+        ICourseRepository courseRepository = null;
+        IChapterRepository chapterRepository = null;
+        ILessonRepository lessonRepository = null;
 
         public ChapterController()
         {
             courseRepository = new CourseRepository();
             chapterRepository = new ChapterRepository();
+            lessonRepository = new LessonRepository();
         }
         //Get LearnerController
-        public ActionResult Index(int courseId)
-        {
-            ViewBag.CourseId = courseId;
-            // Lấy danh sách tất cả các chương từ repository
-            var chapterList = chapterRepository.GetChapters();
+       public ActionResult Index(int courseId)
+{
+    ViewBag.CourseId = courseId;
+    var course = courseRepository.GetCourseByID(courseId);
+    ViewBag.CourseName = course.CourseName;
 
-            // Tìm tất cả các chương có CourseId trùng khớp với courseId
-            var chaptersToDisplay = chapterList.Where(c => c.CourseId == courseId).ToList();
+    // Lấy danh sách tất cả các chương từ repository
+    var chapterList = chapterRepository.GetChapters();
 
-            // Trả về view, truyền danh sách chương để hiển thị
-            return View(chaptersToDisplay);
-        }
+    // Tìm tất cả các chương có CourseId trùng khớp với courseId
+    var chaptersToDisplay = chapterList.Where(c => c.CourseId == courseId);
+    var lessonList = lessonRepository.GetLessons();
+    
+    // Trả về view, truyền danh sách chương và danh sách bài học để hiển thị
+    return View(Tuple.Create(chaptersToDisplay, lessonList));
+}
 
         public ActionResult Detail(int? id)
         {
@@ -81,34 +87,68 @@ namespace Project_Group3.Controllers
             return View();
         }
         //Post: Learnercontroller/ Create
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Create(Chapter chapter, bool redirectToCreateLesson)
+    [HttpPost]
+[ValidateAntiForgeryToken]
+public ActionResult Create(Chapter chapter, bool redirectToCreateLesson, int courseId)
+{
+    try
+    {
+        if (ModelState.IsValid)
         {
-            try
+            // Kiểm tra điều kiện cho thuộc tính ChapterName
+            if (!string.IsNullOrEmpty(chapter.ChapterName))
             {
-                if (ModelState.IsValid)
+                // Kiểm tra điều kiện cho thuộc tính Index
+                if (chapter.Index.HasValue && chapter.Index.Value > 0)
                 {
-                    chapterRepository.InsertChapter(chapter);
-
-                    if (redirectToCreateLesson)
+                    // Kiểm tra điều kiện cho thuộc tính Description
+                    if (!string.IsNullOrEmpty(chapter.Description))
                     {
-                        return RedirectToAction("Create", "Lesson", new { chapterId = chapter.ChapterId, courseId = chapter.CourseId });
+                        // Kiểm tra điều kiện cho thuộc tính TotalTime
+                        if (chapter.TotalTime.HasValue && chapter.TotalTime.Value > 0)
+                        {
+                            chapterRepository.InsertChapter(chapter);
+
+                            if (redirectToCreateLesson)
+                            {
+                                return RedirectToAction("Create", "Lesson", new { chapterId = chapter.ChapterId, courseId = chapter.CourseId });
+                            }
+                            else
+                            {
+                                return RedirectToAction("Index", new { courseId = chapter.CourseId });
+                            }
+                        }
+                        else
+                        {
+                            ModelState.AddModelError("TotalTime", "TotalTime must be a positive value.");
+                        }
                     }
                     else
                     {
-
-                        return RedirectToAction("Index", new { courseId = chapter.CourseId });
+                        ModelState.AddModelError("Description", "Description is required.");
                     }
                 }
+                else
+                {
+                    ModelState.AddModelError("Index", "Index must be a positive value.");
+                }
             }
-            catch (Exception ex)
+            else
             {
-                ViewBag.Message = ex.Message;
+                ModelState.AddModelError("ChapterName", "ChapterName is required.");
             }
-
-            return View(chapter);
         }
+    }
+    catch (Exception ex)
+    {
+        ViewBag.Message = ex.Message;
+    }
+
+    ViewBag.CourseId = courseId;
+    var course = courseRepository.GetCourseByID(courseId);
+    ViewBag.CourseName = course.CourseName;
+    return View(chapter);
+}
         //Get CoureseController/Edit/5
 
         public ActionResult Edit(int? id)

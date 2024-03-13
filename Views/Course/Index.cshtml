@@ -1,0 +1,81 @@
+@model Tuple<IEnumerable<WebLibrary.Models.Course>, IEnumerable<WebLibrary.Models.Chapter>,IEnumerable<WebLibrary.Models.Lesson>,IEnumerable<WebLibrary.Models.Category>>;
+
+@{
+    ViewData["Title"] = "CourseList";
+      Layout = "~/Views/Shared/_Login.cshtml";
+}
+
+
+<h1>List Course</h1>
+<a class="btn btn-success mb-2" asp-action="Create">Add new Course</a>
+<table class="table">
+    <thead>
+        <tr>
+            <th width="50px">CategoryName</th>
+            <th width="50px">CourseName</th>
+            <th width="250px">Description</th>
+            <th width="100px">Picture</th>
+            <th width="50px">TotalTime</th>
+            <th width="60px">Price</th>
+            <th width="80px">StartDate</th>
+            <th width="80px">EndDate</th>
+            <th width="80px">Total Chapter</th>
+                <th width="80px">Total Lesson</th>
+            <th width="50px">Status</th>
+        </tr>
+    </thead>
+    <tbody>
+ @foreach (var course in Model.Item1)
+{
+    <tr>
+        @{     
+                        string categoryName = "";
+                        foreach(var category in Model.Item4){
+                            if(course.CategoryId == category.CategoryId){
+                                categoryName = category.CategoryName;
+                                break;
+                            }
+                        }
+        }
+        <td>@categoryName</td>
+        <td>@course.CourseName</td>
+        <td>@course.Description</td>
+        <td><img src="@Url.Content(course.Picture)" style="width: 100%;"></td>
+        <td>@course.TotalTime</td>
+        <td>@course.Price</td>
+        <td>@course.StartDate</td>
+        <td>@course.EndDate</td>
+        @{
+            int count = 0;
+            foreach (var chapter in Model.Item2)
+            {
+                if (chapter.CourseId == course.CourseId)
+                {
+                    count++;
+                }
+            }
+        }
+        @{
+            int count1 = 0;
+            foreach (var lesson in Model.Item3)
+            {
+                if (lesson.CourseId == course.CourseId)
+                {
+                    count1++;
+                }
+            }
+        }
+        <td>@count</td>
+        <td>@count1</td>
+        <td>@course.Status</td>
+        <td>
+            <a class="btn btn-primary" href="@Url.Action("Index", "Chapter", new { courseId = course.CourseId })">View Chapters</a>
+        </td>
+    </tr>
+}
+
+    </tbody>
+
+    @section Scripts {
+        <partial name="_ValidationScriptsPartial" />
+    }

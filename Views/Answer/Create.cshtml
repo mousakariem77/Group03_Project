@@ -1,0 +1,29 @@
+@model WebLibrary.Models.Answer
+@{
+    ViewBag.Title = "Create Answer";
+      Layout = "~/Views/Shared/_Login.cshtml";
+}
+<h1 class="text-warning text-center">Create Answer</h1>
+
+<form asp-action="Create">
+      <input asp-for="AnswerId" type="hidden" class="form-control" style="width: 25%;"/>
+    <div class="form-group">
+        <label asp-for="Answer1" class="font-weight-bold"></label>
+        <input asp-for="Answer1" class="form-control" style="width: 25%;"/>
+        <span asp-validation-for="Answer1" class="text-danger"></span>
+    </div>
+    
+    <button type="submit" class="btn btn-primary">Create</button>
+    <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+</form>
+ @{
+    var errorMessage = ViewBag.Message as string;
+}
+
+@if (!string.IsNullOrEmpty(errorMessage))
+{
+    <div class="alert alert-danger">@errorMessage</div>
+}
+@section Scripts{
+	<partial name="_ValidationScriptsPartial" />
+}
