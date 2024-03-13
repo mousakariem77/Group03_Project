@@ -1,4 +1,4 @@
-@model Tuple<WebLibrary.Models.Instructor, WebLibrary.Models.Learner>
+@model Tuple<WebLibrary.Models.Instructor, WebLibrary.Models.Learner, IEnumerable<WebLibrary.Models.Enrollment>>
 
 @{
     ViewData["Title"] = "Infomation";
@@ -12,8 +12,8 @@
 <div class="container py-5">
     <div class="mb-2">
         <h6 class="text-primary mb-3">
-            <a href="home.html">Home</a> >
-            <a href="profile.html">My profile</a>
+            <a href="@Url.Action("Index", "Home")">Home</a> >
+            <a href="#">My profile</a>
         </h6>
     </div>
     <div class="row">
@@ -21,16 +21,13 @@
             <div class="contact-form rounded p-5" style="background-color: #F3F4F6">
                 <ul class="navbar-nav list-unstyled" style="margin-top: -30px;">
                     <li class="nav-item pt-2">
-                        <a class="nav-link text-theme" onclick="showContent('information')">Information</a>
+                        <a class="nav-link text-theme" href="#changepass">Information</a>
                     </li>
                     <li class="nav-item pt-2">
-                        <a class="nav-link text-theme" onclick="showContent('changePassword')">Change Password</a>
+                        <a class="nav-link text-theme" href="#information">Change Password</a>
                     </li>
                     <li class="nav-item pt-2">
-                        <a class="nav-link text-theme" onclick="showContent('viewCourses')">View all my course</a>
-                    </li>
-                    <li class="nav-item pt-2">
-                        <a class="nav-link text-theme" onclick="showContent('transaction')">Transaction</a>
+                        <a class="nav-link text-theme" href="#transaction">Transaction</a>
                     </li>
                 </ul>
             </div>
@@ -44,9 +41,7 @@
                             <div class="team-item">
                                 <div class="team-img">
                                     <img class="img-fluid rounded-circle" src="~/img/1.png" alt="">
-                                </div>
-                                <button class="btn btn-primary mt-3 ml-3 d-none ">Select photo</button>
-                                
+                                </div>                                
                             </div>
                         </div>
                         <div class="col-md-9 col-lg-9">
@@ -65,7 +60,7 @@
                                             if(role == "0"){
                                                 <div class="d-flex" style="justify-content: space-between;">
                                                     <label>@Model.Item1.FirstName @Model.Item1.LastName</label>
-                                                    <a class="btn mr-2 cursor-pointer" data-bs-toggle="modal" data-bs-target="#edit" title="Edit">
+                                                    <a class="btn mr-2" style="cursor: pointer;" data-bs-toggle="modal" data-bs-target="#edit" title="Edit">
                                                         <i class='bx bxs-pencil text-primary'></i><br>
                                                     </a>
                                                 </div>
@@ -77,7 +72,7 @@
                                             }else if(role == "1"){
                                                 <div class="d-flex" style="justify-content: space-between;">
                                                     <label>@Model.Item2.FirstName @Model.Item2.LastName</label>
-                                                    <a class="btn mr-2 cursor-pointer" data-bs-toggle="modal" data-bs-target="#edit" title="Edit">
+                                                    <a class="btn mr-2" style="cursor: pointer;" data-bs-toggle="modal" data-bs-target="#edit" title="Edit">
                                                         <i class='bx bxs-pencil text-primary'></i><br>
                                                     </a>
                                                 </div>
@@ -139,7 +134,7 @@
         </div>
 
         <!-- Change Password -->
-        <div id="changePassword" class="changepass col-md-9 col-lg-9" style="display: none;">
+        <div id="changepass" class="changepass col-md-9 col-lg-9" style="display: none;">
             <div class="contact-form rounded p-5" style="background-color: #F3F4F6">
                 <h4 class="text-dark" style="margin-top: -20px;">Change password</h4>
                 <div class="container">
@@ -165,7 +160,44 @@
                 </div>
             </div>
         </div>
+        <div id="transaction" class="transaction col-md-9 col-lg-9" style="display: none;">
+            <div class="contact-form rounded p-5" style="background-color: #F3F4F6">
+                <h4 class="text-dark" style="margin-top: -20px;">Transaction</h4>
+                <div class="container-fluid">
+                    <div class="row m-0">
+                        @{
+                            int countEnrollment = 0;
+                            foreach(var enrollment in Model.Item3){
+                                if(Model.Item2.LearnerId == enrollment.LearnerId){
+                                    countEnrollment++;
+                                    <div class="col-md-12 col-lg-12 bg-white py-3" data-bs-toggle="collapse" data-bs-target="#en@(countEnrollment)">
+                                        <div class="transaction-info">
+                                            <strong>Date:</strong> @enrollment.EnrollmentDate
+                                            <br>
+                                            <strong>Course Name:</strong> @enrollment.CourseName
+                                            <br>
+                                        </div>
+                                        <div id="en@(countEnrollment)" class="collapse">
+                                            @{
+                                                if(@enrollment.IsPaid == true){
+                                                    <strong>Status:</strong><small>Đã thanh toán</small>
+                                                }else{
+                                                    <strong>Status:</strong><small>Chưa thanh toán</small>
+                                                }
+                                            }
+                                            Lorem ipsum dolor sit amet, consectetur adipisicing elit,
+                                            sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
+                                            quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+                                        </div>
+                                    </div>
+                                }
 
+                            }
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
         <!-- view all my Courses -->
     </div>
 </div>
@@ -180,105 +212,135 @@
             <button type="button" class="btn-close bg-theme text-theme border-0" data-bs-dismiss="modal" aria-label="Close">x</button>
         </div>
         <div class="modal-body">
-            <form asp-action="Edit" class="mb-3" enctype="multipart/form-data">
             @{
                 if(role == "0"){
-                    <div class="container-fluid">
-                        <div class="d-flex align-items-start align-items-sm-center">
-                            <div class="avatar-user mr-2 mb-3">
-                                <img class="avatar-initial rounded-circle bg-label-warning" src="~/img/1.png">
+                    <form action="@Url.Action("EditProfile", "Instructor", new { id = Model.Item1.InstructorId })" method="post" class="mb-3" enctype="multipart/form-data">
+                        <div class="container-fluid">
+                            <div class="d-flex align-items-start align-items-sm-center">
+                                <div class="mr-2 mb-3">
+                                    <img class="avatar-initial rounded-circle bg-label-warning" src="~/img/1.png" style="width: 30%">
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 col-lg-6">
+                                    <div class="form-group">
+                                        <label class="text-theme font-weight-bold">First Name</label>
+                                        <input asp-for="@Model.Item1.FirstName" class="form-control" style="width: 100%;" />
+                                    </div>
+                                </div>
+                                <div class="col-md-6 col-lg-6">
+                                    <div class="form-group">
+                                        <label class="text-theme font-weight-bold">Last Name</label>
+                                        <input asp-for="@Model.Item1.LastName" class="form-control" style="width: 100%;" />
+                                    </div>
+                                </div>
+                                <div class="col-md-6 col-lg-6">
+                                    <div class="form-group">
+                                        <label class="text-theme font-weight-bold">Gender</label>
+                                        <select asp-for="@Model.Item1.Gender" class="form-control" style="width: 100%;">
+                                            @{
+                                                if(Model.Item1.Gender == "Male"){
+                                                    <option value="Active" selected>Male</option>
+                                                    <option value="Female">Female</option>
+                                                }else if(Model.Item1.Gender == "Female"){
+                                                    <option value="Active">Male</option>
+                                                    <option value="Delete" selected>Female</option>
+                                                }
+                                            }
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 col-lg-6">
+                                    <div class="form-group">
+                                        <label class="text-theme font-weight-bold">Country</label>
+                                        <input asp-for="@Model.Item1.Country" class="form-control" style="width: 100%;" />
+                                    </div>
+                                </div>
+                                <div class="col-md-6 col-lg-6">
+                                    <div class="form-group">
+                                        <label class="text-theme font-weight-bold">Phone Number</label>
+                                        <input asp-for="@Model.Item1.PhoneNumber" class="form-control" style="width: 100%;" />
+                                    </div>
+                                </div>
+                                <div class="col-md-6 col-lg-6">
+                                    <div class="form-group">
+                                        <label class="text-theme font-weight-bold">Birthday</label>
+                                        <input asp-for="@Model.Item1.Birthday" class="form-control" style="width: 100%;" />
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                        <div class="row">
-                            <div class="col-md-6 col-lg-6">
-                                <div class="form-group">
-                                    <label class="text-theme font-weight-bold">First Name</label>
-                                    <input value="@Model.Item1.FirstName" class="form-control" style="width: 100%;" />
-                                </div>
-                            </div>
-                            <div class="col-md-6 col-lg-6">
-                                <div class="form-group">
-                                    <label class="text-theme font-weight-bold">Last Name</label>
-                                    <input value="@Model.Item1.LastName" class="form-control" style="width: 100%;" />
-                                </div>
-                            </div>
-                            <div class="col-md-6 col-lg-6">
-                                <div class="form-group">
-                                    <label class="text-theme font-weight-bold">Gender</label>
-                                    <input value="@Model.Item1.Gender" class="form-control" style="width: 100%;" />
-                                </div>
-                            </div>
-                            <div class="col-md-6 col-lg-6">
-                                <div class="form-group">
-                                    <label class="text-theme font-weight-bold">Country</label>
-                                    <input value="@Model.Item1.Country" class="form-control" style="width: 100%;" />
-                                </div>
-                            </div>
-                            <div class="col-md-6 col-lg-6">
-                                <div class="form-group">
-                                    <label class="text-theme font-weight-bold">Phone Number</label>
-                                    <input value="@Model.Item1.PhoneNumber" class="form-control" style="width: 100%;" />
-                                </div>
-                            </div>
-                            <div class="col-md-6 col-lg-6">
-                                <div class="form-group">
-                                    <label class="text-theme font-weight-bold">Birthday</label>
-                                    <input value="@Model.Item1.Birthday.Value.ToShortDateString()" asp-format="{0:dd-MM-yyyy}" class="form-control" style="width: 100%;" />
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                        <a asp-action="Index" class="btn btn-secondary mt-2 float-right">Cancel</a>
+                        <button type="submit" class="btn btn-success mr-3 mt-2 float-right">Save</button>
+                    </form>
                 }else if(role == "1"){
-                    <div class="container-fluid">
-                        <div class="d-flex align-items-start align-items-sm-center">
-                            <div class="avatar-user mr-2 mb-3">
-                                <img class="avatar-initial rounded-circle bg-label-warning" src="~/img/1.png">
+                    <form action="@Url.Action("EditProfile", "Learner",  new { id = Model.Item2.LearnerId })" method="post" class="mb-3" enctype="multipart/form-data">
+                        <div class="container-fluid">
+                            <input type="hidden" asp-for="@Model.Item2.LearnerId"/>
+                            <div class="d-flex align-items-start align-items-sm-center">
+                                <div class="mr-2 mb-3">
+                                    <img class="avatar-initial rounded-circle bg-label-warning" src="~/img/1.png" style="width: 30%">
+                                    <label class="text-theme">Upload avatar</label>
+                                    <input type="file" name="fileAnh" class="text-theme">
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 col-lg-6">
+                                    <div class="form-group">
+                                        <label class="text-theme font-weight-bold">First Name</label>
+                                        <input asp-for="@Model.Item2.FirstName" class="form-control" style="width: 100%;" />
+                                    </div>
+                                </div>
+                                <div class="col-md-6 col-lg-6">
+                                    <div class="form-group">
+                                        <label class="text-theme font-weight-bold">Last Name</label>
+                                        <input asp-for="@Model.Item2.LastName" class="form-control" style="width: 100%;" />
+                                    </div>
+                                </div>
+                                <div class="col-md-6 col-lg-6">
+                                    <div class="form-group">
+                                        <label class="text-theme font-weight-bold">Gender</label>
+                                        <select asp-for="@Model.Item2.Gender" class="form-control" style="width: 100%;">
+                                            @{
+                                                if(Model.Item2.Gender == "Male"){
+                                                    <option value="Active" selected>Male</option>
+                                                    <option value="Female">Female</option>
+                                                }else if(Model.Item2.Gender == "Female"){
+                                                    <option value="Active">Male</option>
+                                                    <option value="Delete" selected>Female</option>
+                                                }
+                                            }
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 col-lg-6">
+                                    <div class="form-group">
+                                        <label class="text-theme font-weight-bold">Country</label>
+                                        <input asp-for="@Model.Item2.Country" class="form-control" style="width: 100%;" />
+                                    </div>
+                                </div>
+                                <div class="col-md-6 col-lg-6">
+                                    <div class="form-group">
+                                        <label class="text-theme font-weight-bold">Phone Number</label>
+                                        <input asp-for="@Model.Item2.PhoneNumber" class="form-control" style="width: 100%;" />
+                                    </div>
+                                </div>
+                                <div class="col-md-6 col-lg-6">
+                                    <div class="form-group">
+                                        <label class="text-theme font-weight-bold">Birthday</label>
+                                        <input asp-for="@Model.Item2.Birthday" class="form-control" style="width: 100%;" />
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                        <div class="row">
-                            <div class="col-md-6 col-lg-6">
-                                <div class="form-group">
-                                    <label class="text-theme font-weight-bold">First Name</label>
-                                    <input value="@Model.Item2.FirstName" class="form-control" style="width: 100%;" />
-                                </div>
-                            </div>
-                            <div class="col-md-6 col-lg-6">
-                                <div class="form-group">
-                                    <label class="text-theme font-weight-bold">Last Name</label>
-                                    <input value="@Model.Item2.LastName" class="form-control" style="width: 100%;" />
-                                </div>
-                            </div>
-                            <div class="col-md-6 col-lg-6">
-                                <div class="form-group">
-                                    <label class="text-theme font-weight-bold">Gender</label>
-                                    <input value="@Model.Item2.Gender" class="form-control" style="width: 100%;" />
-                                </div>
-                            </div>
-                            <div class="col-md-6 col-lg-6">
-                                <div class="form-group">
-                                    <label class="text-theme font-weight-bold">Country</label>
-                                    <input value="@Model.Item2.Country" class="form-control" style="width: 100%;" />
-                                </div>
-                            </div>
-                            <div class="col-md-6 col-lg-6">
-                                <div class="form-group">
-                                    <label class="text-theme font-weight-bold">Phone Number</label>
-                                    <input value="@Model.Item2.PhoneNumber" class="form-control" style="width: 100%;" />
-                                </div>
-                            </div>
-                            <div class="col-md-6 col-lg-6">
-                                <div class="form-group">
-                                    <label class="text-theme font-weight-bold">Birthday</label>
-                                    <input value="@Model.Item2.Birthday.Value.ToShortDateString()" asp-format="{0:dd-MM-yyyy}" class="form-control" style="width: 100%;" />
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                        <a asp-action="Index" class="btn btn-secondary mt-2 float-right">Cancel</a>
+                        <button type="submit" class="btn btn-success mr-3 mt-2 float-right">Save</button>
+                    </form>
                 }
             }
-                <a asp-action="Index" class="btn btn-secondary mt-2 float-right">Cancel</a>
-                <button type="submit" class="btn btn-success mr-3 mt-2 float-right">Save</button>
-            </form>
+                @* <a asp-action="Index" class="btn btn-secondary mt-2 float-right">Cancel</a>
+                <button type="submit" class="btn btn-success mr-3 mt-2 float-right">Save</button> *@
+            @* </form> *@
         </div>
     </div>
 </div>

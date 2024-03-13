@@ -1,5 +1,5 @@
-@model Tuple<WebLibrary.Models.Course, WebLibrary.Models.Instructor, IEnumerable<WebLibrary.Models.Review>,
-            IEnumerable<WebLibrary.Models.Learner>, IEnumerable<WebLibrary.Models.Chapter>, IEnumerable<WebLibrary.Models.Lesson>>;
+@model Tuple<WebLibrary.Models.Course, WebLibrary.Models.Instructor, IEnumerable<WebLibrary.Models.Review>,IEnumerable<WebLibrary.Models.Learner>,
+     IEnumerable<WebLibrary.Models.Chapter>, IEnumerable<WebLibrary.Models.Lesson>, IEnumerable<WebLibrary.Models.Enrollment>>;
 @{
     ViewData["Title"] = "Course Detail";
     Layout = "~/Views/Shared/_LayoutHome.cshtml";
@@ -107,20 +107,49 @@
                 <div class="erroll-course">
                     @{
                         var role = Context.Request.Cookies["Role"];
-                        var LearnerID = Context.Request.Cookies["ID"];
-                         if(role != null){
-                            <a class="btn btn-warning mr-2" href="@Url.Action("Index", "Payment", new { learnerId = LearnerID, courseId = Model.Item1.CourseId })" title="Edit">
-                                <button class="erroll-btn btn btn-warning">
-                                    <h5>Enroll</h5>
-                                    <label>Starts March 1</label>
-                                </button>
-                            </a>
-                         }else{
-                            <a class="erroll-btn btn btn-warning" asp-controller="User" asp-action="Login">
-                                <h6 class="text-theme">Please login to continue</h6>
-                                <label class="text-theme">Starts March 1</label>
-                            </a>
-                         }
+                        var LearnerID = int.Parse(Context.Request.Cookies["ID"]);
+                        int findCourse = 0;
+                        foreach(var enrollment in Model.Item7){
+                            if(Model.Item1.CourseId == enrollment.CourseId){
+                                findCourse++;
+                            }
+                        }
+                        if(findCourse == 0){
+                            if(role != null){
+                                <a class="btn btn-warning mr-2" href="@Url.Action("Index", "Payment", new { learnerId = LearnerID, courseId = Model.Item1.CourseId })" title="Edit">
+                                    <button class="erroll-btn btn btn-warning">
+                                        <h5>Enroll</h5>
+                                        <label>Starts March 1</label>
+                                    </button>
+                                </a>
+                            }else{
+                                <a class="erroll-btn btn btn-warning" asp-controller="User" asp-action="Login">
+                                    <h6 class="text-theme">Please login to continue</h6>
+                                    <label class="text-theme">Starts March 1</label>
+                                </a>
+                            }
+                        }else{
+                            foreach(var enrollment in Model.Item7){
+                                if(LearnerID == enrollment.LearnerId && Model.Item1.CourseId == enrollment.CourseId && enrollment.IsPaid == true){
+                                    <a class="erroll-btn btn btn-warning">
+                                        <h6 class="text-theme">Already Enrolled</h6>
+                                    </a>
+                                    break;
+                                }else{
+                                    <a class="btn btn-warning mr-2" href="@Url.Action("Index", "Payment", new { learnerId = LearnerID, courseId = Model.Item1.CourseId })" title="Edit">
+                                        <button class="erroll-btn btn btn-warning">
+                                            <h5>Enroll</h5>
+                                            <label>Starts March 1</label>
+                                        </button>
+                                    </a>
+                                }
+                            }
+                        }
+
+
+
+
+
                     }
                 </div>
                 <h6 class="text-white ml-4 pt-4">
@@ -371,23 +400,34 @@
                 </div>
                 @{
                     if(role != null){
-                    <div class="star-feedback star-post">
-                            <div class="star-item mr-2 mb-2 ml-5 mt-2">
-                                <i class="bx bxs-star text-white"></i>
-                                <i class="bx bxs-star text-white"></i>
-                                <i class="bx bxs-star text-white"></i>
-                                <i class="bx bxs-star text-white"></i>
-                                <i class="bx bxs-star text-white"></i>
-                            </div>
-                        <div class="feedback-post">
-                            <form action="@Url.Action("Create", "Review")" method="post">
-                                <input type="hidden" name="CourseId" value="@Model.Item1.CourseId" />
-                                <input type="hidden" name="LearnerID" value="3" />
-                                <textarea name="Comment" rows="3" cols="40" class="outline-0 ml-3 mt-2" placeholder="Enter your feedback here"></textarea><br>
-                                <button class="btn btn-success float-right mr-5" type="submit">Send</button>
-                            </form>
+                        <div class="star-feedback star-post">
+                                <div class="star-item mr-2 mb-2 ml-5 mt-2">
+                                    <span class="star-item mr-2 mb-2 ml-5 mt-2 cursor-pointer" onclick="rateStar(1)">
+                                        <i class="bx bxs-star"></i>
+                                    </span>
+                                    <span class="star-item mr-2 mb-2" onclick="rateStar(2)">
+                                        <i class="bx bxs-star"></i>
+                                    </span>
+                                    <span class="star-item mr-2 mb-2" onclick="rateStar(3)">
+                                        <i class="bx bxs-star"></i>
+                                    </span>
+                                    <span class="star-item mr-2 mb-2" onclick="rateStar(4)">
+                                        <i class="bx bxs-star"></i>
+                                    </span>
+                                    <span class="star-item mr-2 mb-2" onclick="rateStar(5)">
+                                        <i class="bx bxs-star"></i>
+                                    </span>
+                                </div>
+                            <div class="feedback-post">
+                                <form action="@Url.Action("Create", "Review")" method="post">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="CourseID" value="@ViewBag.CourseID" />
+                                    <input type="hidden" name="Rating" id="rating" value="" />
+                                    <textarea name="Comment" rows="3" cols="40" class="outline-0 ml-3 mt-2" placeholder="Enter your feedback here"></textarea><br>
+                                    <button class="btn btn-success float-right mr-5" type="submit">Send</button>
+                                </form>
+                            </div> 
                         </div>
-                    </div>
                     }
                 }
             </div>
@@ -459,9 +499,9 @@
                                                     }
                                                 }
                                             }
+                                            <small class="mt-2 ml-4">@review.ReviewDate.Value.ToShortDateString()</small>
                                             <p>@review.Comment</p>
                                         </div>
-                                        <small class="mt-2 ml-2">@review.ReviewDate</small>
                                     </div>
                                     <hr>
                                 </li>
@@ -526,9 +566,9 @@
                                                     }
                                                 }
                                             }
+                                            <small class="mt-2 ml-4">@review.ReviewDate.Value.ToShortDateString()</small>
                                             <p>@review.Comment</p>
                                         </div>
-                                        <small class="mt-2 ml-2">@review.ReviewDate</small>
                                     </div>
                                     <hr>
                                 </li>
@@ -537,10 +577,14 @@
                     }
                 }
             </ul>
-            <div class="more-course mb-4 mt-4 ml-5">
-                <button type="button" class="btn btn-primary" data-bs-toggle="collapse" data-bs-target="#more"
-                onclick="toggleButtonText(this)">See more</button>
-            </div>
+            @{
+                if(count > 0){
+                    <div class="more-course mb-4 mt-4 ml-5">
+                        <button type="button" class="btn btn-primary" data-bs-toggle="collapse" data-bs-target="#more"
+                        onclick="toggleButtonText(this)">See more</button>
+                    </div>
+                }
+            }
         </div>
     </div>
 </div>

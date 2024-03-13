@@ -13,14 +13,37 @@ namespace Project_Group3.Controllers
     public class ChapterController : Controller
     {
 
-         ChapterRepository chapterRepository = null;
-        public ChapterController() => chapterRepository = new ChapterRepository();
+        IChapterRepository chapterRepository = null;
+        ICourseRepository courseRepository = null;
+        ICategoryRepository categoryRepository = null;
+        ILessonRepository lessonRepository = null;
+        IInstructorRepository instructorRepository = null;
+        public ChapterController() {
+            courseRepository = new CourseRepository();
+            categoryRepository = new CategoryRepository();
+            chapterRepository = new ChapterRepository();
+            lessonRepository = new LessonRepository();
+            instructorRepository = new InstructorRepository();
+
+        } 
         //Get LearnerController
-        public ActionResult Index()
+        public ActionResult Index(int courseId)
         {
-            var Chapterlist = chapterRepository.GetChapters();
-            return View(Chapterlist);
+            ViewBag.CourseId = courseId;
+            var course = courseRepository.GetCourseByID(courseId);
+            ViewBag.CourseName = course.CourseName;
+
+            // Lấy danh sách tất cả các chương từ repository
+            var chapterList = chapterRepository.GetChapters();
+
+            // Tìm tất cả các chương có CourseId trùng khớp với courseId
+            var chaptersToDisplay = chapterList.Where(c => c.CourseId == courseId);
+            var lessonList = lessonRepository.GetLessons();
+            
+            // Trả về view, truyền danh sách chương và danh sách bài học để hiển thị
+            return View(Tuple.Create(chaptersToDisplay, lessonList));
         }
+        
         public ActionResult Detail(int? id)
         {
             if (id == null)
@@ -35,30 +58,98 @@ namespace Project_Group3.Controllers
             }
             return View(Chapter);
         }
-        //Get Learnercontroller/Create  
-        public ActionResult Create() => View();
-        //Post: Learnercontroller/ Create
+        
+        public ActionResult Create(int courseId)
+        {
+            var course = courseRepository.GetCourseByID(courseId);
+            ViewBag.CourseId = courseId;
+            if (course == null)
+            {
+                // Xử lý khi không tìm thấy khóa học
+                ViewBag.CourseId = courseId;
+                ViewBag.CourseName = "Unknown Course";
+                // Hoặc xử lý lỗi theo ý muốn của bạn
+            }
+            else
+            {
+                ViewBag.CourseId = courseId;
+                if (string.IsNullOrEmpty(course.CourseName))
+                {
+                    // Xử lý khi tên khóa học là null hoặc trống
+                    ViewBag.CourseName = "Unknown Course";
+                    // Hoặc xử lý lỗi theo ý muốn của bạn
+                }
+                else
+                {
+                    ViewBag.CourseName = course.CourseName;
+                }
+            }
+
+            return View();
+        }
+
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create(Chapter Chapter)
+        public ActionResult Create(Chapter chapter, bool redirectToCreateLesson, int courseId)
         {
             try
             {
                 if (ModelState.IsValid)
                 {
-                    chapterRepository.InsertChapter(Chapter);
+                    // Kiểm tra điều kiện cho thuộc tính ChapterName
+                    if (!string.IsNullOrEmpty(chapter.ChapterName))
+                    {
+                        // Kiểm tra điều kiện cho thuộc tính Index
+                        if (chapter.Index.HasValue && chapter.Index.Value > 0)
+                        {
+                            // Kiểm tra điều kiện cho thuộc tính Description
+                            if (!string.IsNullOrEmpty(chapter.Description))
+                            {
+                                // Kiểm tra điều kiện cho thuộc tính TotalTime
+                                if (chapter.TotalTime.HasValue && chapter.TotalTime.Value > 0)
+                                {
+                                    chapterRepository.InsertChapter(chapter);
 
+                                    if (redirectToCreateLesson)
+                                    {
+                                        return RedirectToAction("Create", "Lesson", new { chapterId = chapter.ChapterId, courseId = chapter.CourseId });
+                                    }
+                                    else
+                                    {
+                                        return RedirectToAction("Index", new { courseId = chapter.CourseId });
+                                    }
+                                }
+                                else
+                                {
+                                    ModelState.AddModelError("TotalTime", "TotalTime must be a positive value.");
+                                }
+                            }
+                            else
+                            {
+                                ModelState.AddModelError("Description", "Description is required.");
+                            }
+                        }
+                        else
+                        {
+                            ModelState.AddModelError("Index", "Index must be a positive value.");
+                        }
+                    }
+                    else
+                    {
+                        ModelState.AddModelError("ChapterName", "ChapterName is required.");
+                    }
                 }
-                return RedirectToAction(nameof(Index));
             }
             catch (Exception ex)
             {
                 ViewBag.Message = ex.Message;
-                return View(Chapter);
             }
 
+            ViewBag.CourseId = courseId;
+            var course = courseRepository.GetCourseByID(courseId);
+            ViewBag.CourseName = course.CourseName;
+            return View(chapter);
         }
-        //Get CoureseController/Edit/5
 
         public ActionResult Edit(int? id)
         {

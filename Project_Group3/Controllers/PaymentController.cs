@@ -1,9 +1,11 @@
 using System;
 using System.Collections.Generic;
+using System.Data.Common;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Project_Group3.Models;
@@ -17,16 +19,23 @@ namespace Project_Group3.Controllers
 
     public class PaymentController : Controller
     {
+        public static bool hasPaid = false;
         private readonly IVnpayService _vnpayService;
         ICourseRepository coureseRepository = null;
         ILearnerRepository learnerRepository = null;
-        // ILearnerRepository ilearner = null;
+        IEnrollmentRepository enrollmentRepository = null;
+        PaymentViewModel paymentViewModel = null;
+        ISmtpRepository smtpRepository = null;
+
+        ILearnerRepository ilearner = null;
 
         public PaymentController(IVnpayService vnpayService)
         {
             _vnpayService = vnpayService;
             coureseRepository = new CourseRepository();
             learnerRepository = new LearnerRepository();
+            enrollmentRepository = new EnrollmentRepository();
+            smtpRepository = new StmpRepository();
         }
 
 
@@ -38,11 +47,6 @@ namespace Project_Group3.Controllers
             return View();
         }
         // [Authorize]
-        public IActionResult PaymentSuccess()
-        {
-            // TODO: Your code here
-            return View();
-        }
 
 
 
@@ -51,91 +55,80 @@ namespace Project_Group3.Controllers
 
         public IActionResult PaymentCallback()
         {
+            int? learnerId = HttpContext.Session.GetInt32("learnerId");
+            int? courseId = HttpContext.Session.GetInt32("courseId");
+            Learner learner = learnerRepository.GetLearnerByID((int)learnerId);
+            Course course = coureseRepository.GetCourseByID((int)courseId);
             var response = _vnpayService.PaymentExcute(Request.Query);
-          
-            if (response.VnPayResponseCode != "00" && response == null)
+            if (response == null)
             {
-               System.Console.WriteLine("faillllllllllllllll ");;
+                System.Console.WriteLine("faillllllllllllllll do null"); ;
                 return RedirectToAction("PaymentFail");
-            }
-            // luu don hang vao database
 
-           System.Console.WriteLine("succceessssssssssss");
-            return RedirectToAction("PaymentSuccess");
+            }
+            EnrollmentDAO en = new EnrollmentDAO();
+            en.AddNew((int)learnerId, (int)courseId);
+            smtpRepository.sendMail(learner.Email,"You have successfully enrolled in the course", "Thank you for registering for the "+course.CourseName+  " course."+ " I wish you an enjoyable learning experience.");
+
+
+            return RedirectToAction("CourseDetail", "Home", new { id = courseId });
         }
+        public IActionResult saveBill(PaymentViewModel paymentViewModel)
+        {
+
+
+            return View();
+        }
+
 
         [HttpGet]
         public IActionResult Index(int learnerId, int courseId)
         {
-
             Course c = coureseRepository.GetCourseByID(courseId);
-
             Learner l = learnerRepository.GetLearnerByID(learnerId);
             Console.WriteLine("Learner" + learnerId + " Course" + courseId);
-
-
             if (l == null || c == null)
             {
                 return NotFound(); // Trả về lỗi 404 nếu không tìm thấy người học hoặc khóa học
             }
+            HttpContext.Session.SetInt32("learnerId", learnerId);
+            HttpContext.Session.SetInt32("courseId", courseId);
 
-            PaymentViewModel paymentViewModel = new PaymentViewModel
+            paymentViewModel = new PaymentViewModel
             {
                 courseId = c.CourseId,
                 LeanrerId = l.LearnerId,
                 courseName = c.CourseName,
                 learnerName = l.FirstName + " " + l.LastName,
-                Price = c.Price
-
+                Price = c.Price,
+                Email = l.Email,
+                enrollmentDate = DateTime.Now,
+                status = "false"
             };
+
             return View(paymentViewModel);
         }
-
-
-
 
         [HttpPost]
         public IActionResult CheckOut(PaymentViewModel paymentViewModel)
         {
-            System.Console.WriteLine(paymentViewModel.learnerName);
-            // Course course = coureseRepository.GetCourseByID(courseId);
-            // Learner learner = learnerRepository.GetLearnerByID(learnId);
-            // if (course == null || learner == null)
-            // {
-            //     return NotFound(); // Trả về lỗi 404 hoặc xử lý lỗi tương ứng khi không tìm thấy khóa học hoặc người học
-            // }
-            // var Amount = course.Price;
-            // var Description = $"{learner.FirstName + learner.LastName}{learner.PhoneNumber}";
-            // var Fullname = $"{learner.FirstName + learner.LastName}";
             var VnpayModel = new VnPaymentRequestModel
             {
-                Amount = (int)paymentViewModel.Price * 23000,
+                Amount = (int)paymentViewModel.Price * 1000,
                 CreateDate = DateTime.Now,
                 Description = paymentViewModel.courseName,
                 Fullname = paymentViewModel.learnerName,
                 OrderId = new Random().Next(1000, 100000)
-
-
-                // Amount = Amount,
-                // CreateDate = DateTime.Now,
-                // Description = Description,
-                // Fullname = Fullname,
-                // OrderId = new Random().Next(1000, 100000)
-
             };
-            System.Console.WriteLine(VnpayModel.Description);
-            System.Console.WriteLine(VnpayModel.Amount);
-            System.Console.WriteLine(VnpayModel.CreateDate);
-            System.Console.WriteLine(VnpayModel.Fullname);
-            System.Console.WriteLine(VnpayModel.OrderId);
-
-
-
-
+            // System.Console.WriteLine(paymentViewModel.learnerName);
+            // System.Console.WriteLine(VnpayModel.Description);
+            // System.Console.WriteLine(VnpayModel.Amount);
+            // System.Console.WriteLine(VnpayModel.CreateDate);
+            // System.Console.WriteLine(VnpayModel.Fullname);
+            // System.Console.WriteLine(VnpayModel.OrderId);
             return Redirect(_vnpayService.CreatePaymentUrl(HttpContext, VnpayModel));
         }
     }
-
 
 
 }

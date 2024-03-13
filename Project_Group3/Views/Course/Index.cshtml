@@ -7,6 +7,9 @@
 }
 <link rel="stylesheet" href="~/css/site.css" />
 <link rel="stylesheet" href="~/fonts/boxicons.css" />
+@{
+    var idInstructor = int.Parse(Context.Request.Cookies["ID"]);
+}
 
 <div class="card bg-theme p-0 mt-2 mb-5">
     <div class="container no-footer mt-5 mb-3 p-0">
@@ -77,7 +80,7 @@
                                     <td class="text-theme">
                                         <div class="action-icon d-flex text-center">
                                             <a class="btn btn-warning mr-2"
-                                                href="@Url.Action("Edit", "Course", new { id = @course.CourseId})" title="Edit">
+                                                href="@Url.Action("Index", "Chapter", new { id = @course.CourseId})" title="Edit">
                                                 <i class='bx bxs-edit'></i>
                                             </a>
                                             <a class="btn btn-danger" asp-action="Delete" asp-route-id="@course.CourseId"

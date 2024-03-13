@@ -12,7 +12,7 @@
                 <a asp-controller="User" asp-action="Register" class="btn btn-register position-absolute mr-5">Sign up</a>
                 <img src="~/img/avatars/birdEdu.png" alt="Icon" class="icon-image" style="width: 80%;">
             </div>
-            <div class="col-md-6">
+            <div class="login col-md-6">
                 <div class="card-body">
                     <h2 class="card-title text-center">LOGIN</h2>
                     <form asp-controller="User" asp-action="Login" method="post">
@@ -32,13 +32,14 @@
                         <a href="/home" class="btn btn-secondary p-2" style="width: 30%;">Cancel</a>
                         <a href="#" class="btn btn-link float-right mb-3">Forgot Password</a>
                     </form>
-                    @if (!string.IsNullOrEmpty(ViewBag.err))
-                    {
-                        <div class="alert alert-info mt-3" role="alert">
-                            @ViewBag.err
-                        </div>
-                    }
                 </div>
+                @if (!string.IsNullOrEmpty(ViewBag.err))
+                {
+                    <div class="mess-err alert alert-info" role="alert" style="position: absolute; width: 17rem; 
+                    top: 10rem; right: -16rem; ">
+                        @ViewBag.err
+                    </div>
+                }
             </div>
         </div>
     </div>

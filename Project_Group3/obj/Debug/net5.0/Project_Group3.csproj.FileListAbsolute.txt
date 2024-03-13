@@ -136,7 +136,6 @@ D:\Group03_Project\Project_Group3\obj\Debug\net5.0\Project_Group3.RazorCoreGener
 D:\Group03_Project\Project_Group3\obj\Debug\net5.0\Razor\Views\Home\Index.cshtml.g.cs
 D:\Group03_Project\Project_Group3\obj\Debug\net5.0\Razor\Views\Instructor\Create.cshtml.g.cs
 D:\Group03_Project\Project_Group3\obj\Debug\net5.0\Razor\Views\Instructor\Delete.cshtml.g.cs
-D:\Group03_Project\Project_Group3\obj\Debug\net5.0\Razor\Views\Instructor\Edit.cshtml.g.cs
 D:\Group03_Project\Project_Group3\obj\Debug\net5.0\Razor\Views\Shared\Error.cshtml.g.cs
 D:\Group03_Project\Project_Group3\obj\Debug\net5.0\Razor\Views\Shared\_Layout.cshtml.g.cs
 D:\Group03_Project\Project_Group3\obj\Debug\net5.0\Razor\Views\Shared\_ValidationScriptsPartial.cshtml.g.cs
@@ -172,7 +171,6 @@ D:\Group03_Project\Project_Group3\obj\Debug\net5.0\Razor\Views\Admin\Instructor.
 D:\Group03_Project\Project_Group3\obj\Debug\net5.0\Razor\Views\Admin\Learner.cshtml.g.cs
 D:\Group03_Project\Project_Group3\obj\Debug\net5.0\Razor\Views\Admin\Course.cshtml.g.cs
 D:\Group03_Project\Project_Group3\obj\Debug\net5.0\Razor\Views\Admin\UserDetail.cshtml.g.cs
-D:\Group03_Project\Project_Group3\obj\Debug\net5.0\Razor\Views\Admin\UserEdit.cshtml.g.cs
 D:\Group03_Project\Project_Group3\obj\Debug\net5.0\Razor\Views\Home\Profile.cshtml.g.cs
 D:\Group03_Project\Project_Group3\obj\Debug\net5.0\Razor\Views\Home\Learning.cshtml.g.cs
 D:\Group03_Project\Project_Group3\obj\Debug\net5.0\Razor\Views\User\Login.cshtml.g.cs
@@ -197,3 +195,9 @@ D:\Group03_Project\Project_Group3\obj\Debug\net5.0\Razor\Views\Home\CourseDetail
 D:\Group03_Project\Project_Group3\obj\Debug\net5.0\Razor\Views\Course\Create.cshtml.g.cs
 D:\Group03_Project\Project_Group3\obj\Debug\net5.0\Razor\Views\Course\Index.cshtml.g.cs
 D:\Group03_Project\Project_Group3\obj\Debug\net5.0\Razor\Views\Shared\_LayoutCourse.cshtml.g.cs
+D:\Group03_Project\Project_Group3\obj\Debug\net5.0\Razor\Views\Instructor\Edit.cshtml.g.cs
+D:\Group03_Project\Project_Group3\obj\Debug\net5.0\Razor\Views\Admin\courseDetail.cshtml.g.cs
+D:\Group03_Project\Project_Group3\obj\Debug\net5.0\Razor\Views\Admin\AccountModeration.cshtml.g.cs
+D:\Group03_Project\Project_Group3\obj\Debug\net5.0\Razor\Views\Chapter\Index.cshtml.g.cs
+D:\Group03_Project\Project_Group3\obj\Debug\net5.0\Razor\Views\Lesson\Create.cshtml.g.cs
+D:\Group03_Project\Project_Group3\obj\Debug\net5.0\Razor\Views\Lesson\Index.cshtml.g.cs

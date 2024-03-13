@@ -17,13 +17,15 @@ namespace Project_Group3.Controllers
     public class UserController : Controller
     {
         InstructorRepository instructorRepository = null;
-        LearnerRepository learnerRepository = null;
-        AdminRepository adminRepository = null;
+        ILearnerRepository learnerRepository = null;
+        IAdminRepository adminRepository = null;
+        ISmtpRepository smtpRepository = null;
         public UserController()
         {
             learnerRepository = new LearnerRepository();
             instructorRepository = new InstructorRepository();
             adminRepository = new AdminRepository();
+            smtpRepository = new StmpRepository();
         }
 
         public IActionResult Login()
@@ -35,19 +37,14 @@ namespace Project_Group3.Controllers
 
             if (insSession != null)
             {
-
-                // Nếu đã đăng nhập là Instructor, chuyển hướng đến trang của Instructor.
                 return RedirectToAction("Index", "Home");
             }
             else if (learnerSession != null)
             {
-
-                // Nếu đã đăng nhập là Learner, chuyển hướng đến trang của Learner.
                 return RedirectToAction("Index", "Home");
             }
             else
             {
-                // Nếu chưa đăng nhập, hiển thị trang đăng nhập.
                 return View();
             }
         }
@@ -61,7 +58,6 @@ namespace Project_Group3.Controllers
 
                 if (!ModelState.IsValid)
                 {
-                    // Xử lý lỗi khi dữ liệu đầu vào không hợp lệ
                     return View(model);
                 }
 
@@ -75,6 +71,13 @@ namespace Project_Group3.Controllers
                     // HttpContext.Session.SetString("UserRole", "Instructor");
                     // HttpContext.Session.SetInt32("InsID", instructor.InstructorId);
                     // Response.Cookies.Append("MyCookie", instructor.InstructorId.ToString());
+                    if(instructor.Status == "Wait"){
+                        ViewBag.err = "The account has not been moderated!!!";
+                        return View();
+                    }else if(instructor.Status == "Delete"){
+                        ViewBag.err = "The account no longer exists!!!";
+                        return View();
+                    }
                     Response.Cookies.Append("Role", "0");
                     Response.Cookies.Append("Name", instructor.Username);
                     Response.Cookies.Append("ID", instructor.InstructorId.ToString());
@@ -94,7 +97,7 @@ namespace Project_Group3.Controllers
                 }
                 else
                 {
-                    ViewBag.err = "Email, User và mật khẩu không đúng vui lòng nhập kiểm tra lại!.";
+                    ViewBag.err = "Email, user or password incorrectly please enter again!.";
                     return View(model);
                 }
             }

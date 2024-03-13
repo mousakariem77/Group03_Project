@@ -10,8 +10,13 @@ namespace Project_Group3.Models
         public int LeanrerId { get; set; }
         public int courseId { get; set; }
         public decimal? Price { get; set; }
+        public string Email { get; set; }
+        public DateTime enrollmentDate { get; set; }       
         public string courseName { get; set; }
         public string learnerName { get; set; }
+        public string status { get; set; }
+
+
 
     }
 }

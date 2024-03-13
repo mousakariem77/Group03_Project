@@ -66,22 +66,22 @@
                                                                         <img class="img-fluid" src="~/img/avatars/course/course-4.jpg" alt="">
                                                                         <div class="p-4" style="border: 1px solid #a7a7a7; background-color: #e3e3e3;">
                                                                             <div class="d-flex justify-content-between mb-3 text-theme">
-                                                                                <small class="m-0"><i class="fa fa-users text-dark mr-2"></i>25 Students</small>
+                                                                                <small class="m-0"><i class="fa fa-users text-dark mr-2"></i>26 Students</small>
                                                                                 <small class="m-0"><i class="bx bxs-time text-primary mr-2"></i>@course.TotalTime</small>
                                                                             </div>
                                                                             <h5 class="course-name text-theme">@course.CourseName</h5>
                                                                             <div class="border-top mt-4 pt-4">
                                                                                 <div class="d-flex justify-content-between text-theme">
                                                                                     @{
-                                                                                        int rating = 0;
+                                                                                        int? rating = 0;
                                                                                         int count = 0;
                                                                                         foreach(var review in Model.Item5){
                                                                                             if(review.CourseId == course.CourseId){
-                                                                                                @* rating += review.Rating; *@
+                                                                                                rating += review.Rating;
                                                                                                 count++;
                                                                                             }
                                                                                         }
-                                                                                        int average = count > 0 ? rating / count : 0;
+                                                                                        int? average = count > 0 ? rating / count : 0;
                                                                                     }
                                                                                     <h6 class="m-0"><i class="bx bxs-star text-warning mr-2 mb-2"></i>@average<small class="ml-1">(@count)</small></h6>
                                                                                     <h5 class="m-0">@(course.Price)đ</h5>
@@ -106,15 +106,15 @@
                                                                             <div class="border-top mt-4 pt-4">
                                                                                 <div class="d-flex justify-content-between text-theme">
                                                                                     @{
-                                                                                        int rating = 0;
+                                                                                        int? rating = 0;
                                                                                         int count = 0;
                                                                                         foreach(var review in Model.Item5){
                                                                                             if(review.CourseId == course.CourseId){
-                                                                                                @* rating += review.Rating; *@
+                                                                                                rating += review.Rating;
                                                                                                 count++;
                                                                                             }
                                                                                         }
-                                                                                        int average = count > 0 ? rating / count : 0;
+                                                                                        int? average = count > 0 ? rating / count : 0;
                                                                                     }
                                                                                     <h6 class="m-0"><i class="bx bxs-star text-warning mr-2 mb-2"></i>@average<small class="ml-1">(@count)</small></h6>
                                                                                     <h5 class="m-0">@(course.Price)đ</h5>

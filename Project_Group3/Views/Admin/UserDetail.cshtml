@@ -14,10 +14,10 @@
     <div class="card mb-4 bg-theme">
         <div class="card-body d-flex" style="justify-content: space-between;">
             <div class="d-flex align-items-start align-items-sm-center gap-4 ml-5">
-                <div class="avatar-user mr-2 mt-5">
-                    <img class="avatar-initial rounded-circle bg-label-warning" src="~/img/1.png">
+                <div class=" mr-2 mt-5">
+                    <img class="avatar-initial rounded-circle bg-label-warning" src="~/img/1.png" style="width: 100%;" >
                 </div>
-                <div class="id-text form-group ml-2">
+                <div class="id-text form-group">
                     @{
                         if(role.Equals("instructor")){
                             <label class="text-theme font-weight-bold">InstructorId</label>
@@ -28,7 +28,7 @@
                         }
                     }
                 </div>
-                <div class="btn-next mt-5 d-flex">
+                <div class="btn-next mt-5 d-flex mr-5">
                     @if (role.Equals("instructor"))
                     {
                         <form method="post" action="/Admin/Previous">
