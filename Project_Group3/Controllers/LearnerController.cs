@@ -12,11 +12,13 @@ namespace Project_Group3.Controllers
    
     public class LearnerController : Controller
     {
-         LearnerRepository LearnerRepository = null;
-        public LearnerController() => LearnerRepository = new LearnerRepository();
+        ILearnerRepository learnerRepository = null;
+        public LearnerController(){
+            learnerRepository = new LearnerRepository();
+        }
         public IActionResult Index(string search = "", int page = 1, int pageSize = 2)
         {
-            var learnerList = LearnerRepository.GetLearners();
+            var learnerList = learnerRepository.GetLearners();
 
             if (!string.IsNullOrEmpty(search))
             {
@@ -41,7 +43,7 @@ namespace Project_Group3.Controllers
             {
                 return NotFound();
             }
-            var Learner= LearnerRepository.GetLearnerByID(id.Value);
+            var Learner= learnerRepository.GetLearnerByID(id.Value);
             if (Learner== null)
             {
                 return NotFound();
@@ -60,7 +62,7 @@ namespace Project_Group3.Controllers
             {
                 if (ModelState.IsValid)
                 {
-                    LearnerRepository.InsertLearner(Learner);
+                    learnerRepository.InsertLearner(Learner);
 
                 }
                 return RedirectToAction(nameof(Index));
@@ -72,78 +74,84 @@ namespace Project_Group3.Controllers
             }
 
         }
-        //Get LearnersController/Edit/5
-
-        public ActionResult Edit(int? id)
+        public IActionResult Edit(int? id)
         {
-            if (id == null)
-            {
+            if(id == null){
                 return NotFound();
             }
-            var Learner= LearnerRepository.GetLearnerByID(id.Value);
-            if (Learner== null)
-            {
+            var learner = learnerRepository.GetLearnerByID(id.Value);
+            if(learner == null){
                 return NotFound();
             }
-            return View(Learner);
+            return View(learner);
         }
-        //Post  Learnercontroller/edit/5
+        
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, Learner Learner)
+        public ActionResult Edit(int id, Learner learner){
+            try{
+                if(id != learner.LearnerId){
+                    return NotFound();
+                }
+                if(ModelState.IsValid){
+                    learnerRepository.UpdateLearner(learner);
+                }
+                return RedirectToAction("Instructor", "Admin");
+            }catch(Exception ex){
+                ViewBag.Message = ex.Message;
+                return View();
+            }
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult EditProfile(int id, Learner learner)
         {
             try
             {
-                if (id != Learner.LearnerId)
+                var existingLearner = learnerRepository.GetLearnerByID(id);
+                if (existingLearner == null)
                 {
                     return NotFound();
                 }
+
                 if (ModelState.IsValid)
                 {
-                    LearnerRepository.UpdateLearner(Learner);
+                    learnerRepository.UpdateLearner(learner);
+                    return RedirectToAction("Index", "Home");
                 }
-                TempData["EditSuccess"] = true;
-                return RedirectToAction(nameof(Index));
+
+                return View(learner);
             }
             catch (Exception ex)
             {
                 ViewBag.Message = ex.Message;
-                return View();
+                return View(learner);
+            }
+        }
 
-            }
-        }
-        //Get LearnerController/Delete/5
-        public ActionResult Delete(int? id)
+        public IActionResult Delete(int? id)
         {
-            if (id == null)
-            {
+            if(id == null){
                 return NotFound();
             }
-            var Learner= LearnerRepository.GetLearnerByID(id.Value);
-            if (Learner== null)
-            {
+            var learner = learnerRepository.GetLearnerByID(id.Value);
+            if(learner == null){
                 return NotFound();
             }
-            return View(Learner);
+            return View(learner);
         }
-        //Post Learnercontroller/delete/5
+
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id)
-        {
-            try
-            {
-                LearnerRepository.DeleteLearner(id);
-                TempData["DeleteSuccess"] = true;
-                return RedirectToAction(nameof(Index));
-            }
-            catch (Exception ex)
-
-            {
+        public ActionResult Delete(int id){
+            try{
+                learnerRepository.DeleteLearner(id);
+                return RedirectToAction("Learner", "Admin");
+            }catch(Exception ex){
                 ViewBag.Message = ex.Message;
                 return View();
             }
-
         }
     }
 }

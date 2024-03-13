@@ -123,7 +123,6 @@ body {
 }
 .notifi-icon i{
   font-size: 1.5rem;
-  margin-right: 15px;
   position: relative;
 }
 .notifi-icon .badge{
@@ -132,8 +131,19 @@ body {
   font-size: .7rem;
   text-align: center;
   position: absolute;
-  top: 28px;
-  right: 6.6rem;
+  top: 4px;
+  right: 5rem;
+  box-shadow: 0 0 0 2px #fff;
+}
+
+.notifi-icon .badge-intructor{
+  width: 16px;
+  height: 16px;
+  font-size: .7rem;
+  text-align: center;
+  position: absolute;
+  top: 1.8rem;
+  right: 9.5rem;
   box-shadow: 0 0 0 2px #fff;
 }
 .dataTables_length{
@@ -251,13 +261,6 @@ html[data-bs-theme="dark"] .active-list span{
   font-size: 1rem;
   margin: -5px 0 7px -6px;
 }
-.avatar-user{
-  width: 10rem;
-  height: auto;
-}
-.avatar-user img{
-  width: 100%;
-}
 .id-text{
   margin-top: 6.2rem !important;
 }
@@ -334,4 +337,142 @@ h5.course-name {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+/* Home - CourseDetail */
+.instructor-item{
+  width: 100px;
+  height: auto;
+  margin-top: 20px;
+}
+.instructor-item label{
+  width: 200px;
+}
+.instructor-img{
+  width: 100%;
+}
+.erroll-btn{
+  width: 15rem;
+  height: 4rem;
+}
+.erroll-btn h5{
+  font-weight: 700;
+}
+.bird-intro{
+  margin: .1rem 0 0 9rem;
+}
+.bird-intro h6{
+  margin-left: 5rem;
+}
+.box-chaper{
+  cursor: pointer;
+}
+.chapter-list{
+  background-color: #F2F1F8;
+  justify-content: space-between;
+}
+.chapter-item{
+  width: 60rem;
+}
+.chapter-item i{
+  padding-top: 2px;
+}
+.quanity-lesson{
+  margin: auto;
+}
+.lesson-item h6{
+  font-weight: 400;
+}
+.info-title label{
+  padding: 5px;
+  margin-left: -15px;
+}
+.feedback-container{
+  margin-top: 50px;
+  background-color: #F3F4F6 !important;
+}
+.feedback-container .star-container{
+  margin-left: 10rem;
+}
+#feedback{
+  border-right: 1px solid #DADBDD;
+}
+.feedback-post textarea {
+  width: 100%;
+  height: 200px;
+}
+.dropdown-toggle::after {
+  border-top: 0 !important;
+}
+.bg-login {
+  background: url(../img/elements/bg-login.png), no-repeat center center;
+  background-size: cover;
+  height: calc(100vh - 100vh);
+}
+.container-login{
+  position: relative;
+}
+.bg-login .btn-register{
+  top: 2rem;
+  left: 12rem;
+}
+.avatar-user{
+  cursor: pointer;
+  position: relative;
+}
+.avatar-user::after{
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 2rem;
+  width: 8px;
+  height: 8px;
+  border-radius: 100%;
+  box-shadow: 0 0 0 2px #fff;
+  background-color: #71dd37;
+}
+
+.avatar-instructor{
+  cursor: pointer;
+  position: relative;
+}
+.avatar-instructor::after{
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 2rem;
+  width: 8px;
+  height: 8px;
+  border-radius: 100%;
+  box-shadow: 0 0 0 2px #fff;
+  background-color: #71dd37;
+}
+.video-container {
+  border: 1px #000 solid;
+}
+.course-title{
+  margin-top: 8px;
+}
+.course-title > a{
+  width: 20px;
+  height: 20px;
+  text-decoration: none;
+}
+.course-title > label{
+  margin-top: 6px;
+}
+.course-back{
+  z-index: 10;
+  cursor: pointer;
+}
+.course-back i{
+  font-size: 1.3rem;
+}
+.user-plus {
+  position: relative;
+  display: inline-block;
+}
+.birdEdu-image {
+  position: absolute;
+  bottom: 0;
+  margin-bottom: 20px; /* Khoảng cách trắng với các nav-bar */
 }
