@@ -42,13 +42,47 @@ namespace WebLibrary.DAO
             return learners;
         }
 
+        public Learner GetLearnerByEmail(string email)
+        {
+            Learner learner = null;
+            try
+            {
+                using var context = new DBContext();
+                learner = context.Learners.SingleOrDefault(c => c.Email == email);
+
+            }
+            catch (System.Exception)
+            {
+
+                throw;
+            }
+            return learner;
+        }
+
+        public Learner GetLearnerByUser(string user)
+        {
+            Learner learner = null;
+            try
+            {
+                using var context = new DBContext();
+                learner = context.Learners.SingleOrDefault(c => c.Username == user);
+
+            }
+            catch (System.Exception)
+            {
+
+                throw;
+            }
+            return learner;
+        }
+
         public Learner GetLearnerByID(int learnerID)
         {
             Learner learner = null;
             try
             {
                 using var context = new DBContext();
-                learner = context.Learners.SingleOrDefault(c => c.LearnerId.Equals(learnerID));
+                learner = context.Learners.SingleOrDefault(c => c.LearnerId == learnerID);
 
             }
             catch (System.Exception)
@@ -122,12 +156,72 @@ namespace WebLibrary.DAO
                 }
                 else
                 {
-                    throw new Exception("The learner does not exist.");
+                    throw new Exception("The product does not exist.");
                 }
             }
             catch (Exception ex)
             {
                 throw new Exception(ex.Message);
+            }
+        }
+
+        public Learner Get1LearnerByEmailOrUser(string EmailOrUserName)
+        {
+            Learner learner = null;
+
+            try
+            {
+                using var context = new DBContext();
+                learner = context.Learners
+                    .FirstOrDefault(c => c.Username == EmailOrUserName || c.Email == EmailOrUserName);
+            }
+            catch (Exception ex)
+            {
+                // Xử lý ngoại lệ, ví dụ: ghi log
+                Console.WriteLine($"Error in Get1LearnerByEmailOrUser: {ex.Message}");
+                // Có thể ném lại ngoại lệ nếu bạn muốn thông báo lên tầng cao hơn.
+            }
+
+            return learner;
+        }
+
+
+        public bool VerifyPassword(string pass, string LearnerPassword)
+        {
+            return String.Equals(pass, LearnerPassword, StringComparison.OrdinalIgnoreCase);
+        }
+
+        public bool VerifyUserName(string user, string LearnerUserName)
+        {
+            return String.Equals(user, LearnerUserName, StringComparison.OrdinalIgnoreCase);
+        }
+
+        public bool VerifyEmail(string email, string LearnerEmail)
+        {
+            return String.Equals(email, LearnerEmail, StringComparison.OrdinalIgnoreCase);
+        }
+
+        public bool CheckEmailAndUser(string EmaiOrUser, string LearnerEmail, string LearnerUserName)
+        {
+            return String.Equals(EmaiOrUser, LearnerEmail, StringComparison.OrdinalIgnoreCase) || String.Equals(EmaiOrUser, LearnerUserName, StringComparison.OrdinalIgnoreCase);
+        }
+
+        public void UpdatePass(int id, string pass)
+        {
+            Learner existingLearner = GetLearnerByID(id);
+            if (existingLearner != null)
+            {
+                existingLearner.Password = pass;
+
+                using (var context = new DBContext())
+                {
+                    context.Learners.Update(existingLearner);
+                    context.SaveChanges();
+                }
+            }
+            else
+            {
+                throw new Exception("The learner does not exist.");
             }
         }
     }

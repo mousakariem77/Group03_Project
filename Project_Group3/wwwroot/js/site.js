@@ -60,6 +60,51 @@ document.addEventListener("DOMContentLoaded", function() {
 });
 
 
+document.addEventListener("DOMContentLoaded", function() {
+  var informationLink = document.querySelector("a[href='#changepass']");
+  var changepassLink = document.querySelector("a[href='#information']");
+  var informationSection = document.getElementById("information");
+  var changepassSection = document.getElementById("changepass");
+
+  // Kiểm tra nếu URL chứa '#information', '#changepass', '#myCourse' hoặc '#transaction'
+  if (window.location.href.includes('#information')) {
+      informationLink.classList.add("text-primary");
+      changepassSection.style.display = "none";
+  } else if (window.location.href.includes('#changepass')) {
+      changepassLink.classList.add("text-primary");
+      informationSection.style.display = "none";
+  } else {
+      informationLink.classList.add("text-primary");
+      changepassSection.style.display = "none";
+  }
+
+  informationLink.addEventListener("click", function(e) {
+      e.preventDefault();
+      informationSection.style.display = "block";
+      informationLink.classList.add("text-primary");
+      changepassSection.style.display = "none";
+      changepassLink.classList.remove("text-primary");
+  });
+
+  changepassLink.addEventListener("click", function(e) {
+      e.preventDefault();
+      changepassSection.style.display = "block";
+      changepassLink.classList.add("text-primary");
+      informationSection.style.display = "none";
+      informationLink.classList.remove("text-primary");
+  });
+});
+
+//Time of video
+var video = document.getElementById('myVideo');
+video.addEventListener('loadedmetadata', function() {
+    var duration = Math.round(video.duration);
+    var minutes = Math.floor(duration / 60);
+    var seconds = duration % 60;
+    var formattedDuration = minutes + ':' + (seconds < 10 ? '0' : '') + seconds;
+    document.getElementById('videoDuration').innerText = 'Thời lượng: ' + formattedDuration;
+});
+
 // Write your JavaScript code.
 function time() {
     var today = new Date();

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Data.Common;
 using System.Diagnostics;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
@@ -26,8 +27,9 @@ namespace Project_Group3.Controllers
         IEnrollmentRepository enrollmentRepository = null;
         PaymentViewModel paymentViewModel = null;
         ISmtpRepository smtpRepository = null;
+        IVoucherRepository voucherRepository = null;
 
-        ILearnerRepository ilearner = null;
+        // ILearnerRepository ilearner = null;
 
         public PaymentController(IVnpayService vnpayService)
         {
@@ -36,6 +38,7 @@ namespace Project_Group3.Controllers
             learnerRepository = new LearnerRepository();
             enrollmentRepository = new EnrollmentRepository();
             smtpRepository = new StmpRepository();
+            voucherRepository = new VoucherRepository();
         }
 
 
@@ -55,11 +58,13 @@ namespace Project_Group3.Controllers
 
         public IActionResult PaymentCallback()
         {
+            
             int? learnerId = HttpContext.Session.GetInt32("learnerId");
             int? courseId = HttpContext.Session.GetInt32("courseId");
             Learner learner = learnerRepository.GetLearnerByID((int)learnerId);
             Course course = coureseRepository.GetCourseByID((int)courseId);
             var response = _vnpayService.PaymentExcute(Request.Query);
+
             if (response == null)
             {
                 System.Console.WriteLine("faillllllllllllllll do null"); ;
@@ -67,17 +72,13 @@ namespace Project_Group3.Controllers
 
             }
             EnrollmentDAO en = new EnrollmentDAO();
-            en.AddNew((int)learnerId, (int)courseId);
-            smtpRepository.sendMail(learner.Email,"You have successfully enrolled in the course", "Thank you for registering for the "+course.CourseName+  " course."+ " I wish you an enjoyable learning experience.");
 
+            en.AddNew((int)learnerId, (int)courseId);
+            System.Console.WriteLine(learnerId + courseId);
+
+            smtpRepository.sendMail(learner.Email, "You have successfully enrolled in the course", "Thank you for registering for the " + course.CourseName + " course." + " I wish you an enjoyable learning experience.");
 
             return RedirectToAction("CourseDetail", "Home", new { id = courseId });
-        }
-        public IActionResult saveBill(PaymentViewModel paymentViewModel)
-        {
-
-
-            return View();
         }
 
 
@@ -112,22 +113,63 @@ namespace Project_Group3.Controllers
         [HttpPost]
         public IActionResult CheckOut(PaymentViewModel paymentViewModel)
         {
-            var VnpayModel = new VnPaymentRequestModel
+            string voucher = paymentViewModel.voucher;
+            var learnerID =paymentViewModel.LeanrerId;
+            System.Console.WriteLine(voucher);      
+             System.Console.WriteLine(learnerID);
+
+            if (string.IsNullOrEmpty(voucher))
             {
-                Amount = (int)paymentViewModel.Price * 1000,
-                CreateDate = DateTime.Now,
-                Description = paymentViewModel.courseName,
-                Fullname = paymentViewModel.learnerName,
-                OrderId = new Random().Next(1000, 100000)
-            };
-            // System.Console.WriteLine(paymentViewModel.learnerName);
-            // System.Console.WriteLine(VnpayModel.Description);
-            // System.Console.WriteLine(VnpayModel.Amount);
-            // System.Console.WriteLine(VnpayModel.CreateDate);
-            // System.Console.WriteLine(VnpayModel.Fullname);
-            // System.Console.WriteLine(VnpayModel.OrderId);
-            return Redirect(_vnpayService.CreatePaymentUrl(HttpContext, VnpayModel));
+                var VnpayModel = new VnPaymentRequestModel
+                {
+                    Amount = (int)paymentViewModel.Price * 1000,
+                    CreateDate = DateTime.Now,
+                    Description = paymentViewModel.courseName,
+                    Fullname = paymentViewModel.learnerName,
+                    OrderId = new Random().Next(1000, 100000)
+                };
+                System.Console.WriteLine("null voucher");
+                // Không có voucher được nhập
+                return Redirect(_vnpayService.CreatePaymentUrl(HttpContext, VnpayModel));
+            }
+            else
+            {
+                var v = voucherRepository.GetVoucherByCode(voucher);
+                bool isVoucherUsed = VoucherUsageDAO.Instance.IsVoucherUsedByUser(voucher, learnerID);
+                if (isVoucherUsed == false)
+                {
+                    ModelState.AddModelError("", "You have already used this voucher");
+                    System.Console.WriteLine("loi isused");
+                    return RedirectToAction("PaymentFail");
+                }
+                if (v == null)
+                {
+                    ModelState.AddModelError("", "Invalid voucher"); // Thêm lỗi vào ModelState
+                    return RedirectToAction("PaymentFail");// Trả về view với model và hiển thị lỗi
+                }
+                else
+                {
+                    if (DateTime.Now - v.StartAt >= v.EndAt - v.StartAt)
+                    {
+                        return RedirectToAction("PaymentFail");
+                    }
+                        VoucherUsageDAO.Instance.SaveVoucherUsage(voucher,paymentViewModel.LeanrerId);
+                    var VnpayModel = new VnPaymentRequestModel
+                    {
+                        Amount = ((int)paymentViewModel.Price * 1000) - ((int)paymentViewModel.Price * 1000 * v.PercentDiscount / 100),
+
+                        CreateDate = DateTime.Now,
+                        Description = paymentViewModel.courseName,
+                        Fullname = paymentViewModel.learnerName,
+                        OrderId = new Random().Next(1000, 100000)
+                    };
+
+                    return Redirect(_vnpayService.CreatePaymentUrl(HttpContext, VnpayModel));
+                }
+            }
         }
+
+
     }
 
 

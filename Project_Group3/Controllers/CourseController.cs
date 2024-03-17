@@ -8,20 +8,26 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Extensions.Logging;
+using Microsoft.VisualBasic;
+using Project_Group3.Models;
 using WebLibrary.Models;
 using WebLibrary.Repository;
 namespace Project_Group3.Controllers
 {
-    
+
     public class CourseController : Controller
     {
-    
+
         ICourseRepository courseRepository = null;
         ICategoryRepository categoryRepository = null;
         IChapterRepository chapterRepository = null;
         ILessonRepository lessonRepository = null;
         IInstructorRepository instructorRepository = null;
         IInstructRepository instructRepository = null;
+        private int idInstructor;
+
+
+
         public CourseController()
         {
             courseRepository = new CourseRepository();
@@ -32,59 +38,63 @@ namespace Project_Group3.Controllers
             instructRepository = new InstructRepository();
         }
 
-        public IActionResult Index(int id, string search = "", int page = 1, int pageSize = 10)
+        public IActionResult Index(int id, string search = "", int page = 1)
         {
-            var courseList = courseRepository.GetCourses();
-            var chapterList = chapterRepository.GetChapters();
-            var categoryList = categoryRepository.GetCategorys();
-            var instruct = instructRepository.GetInstructs();
-
-            var instructor = instructorRepository.GetInstructorByID(id);
-            if (instructor == null) 
+            idInstructor = int.Parse(HttpContext.Session.GetInt32("InsID").GetValueOrDefault().ToString());
+            try
             {
-                return NotFound(); 
+                var instructor = instructorRepository.GetInstructorByID(id);
+                if (instructor == null) return NotFound();
 
+                var courseList = courseRepository.GetCourses();
+                var chapterList = chapterRepository.GetChapters();
+                var categoryList = categoryRepository.GetCategorys();
+                var instructList = instructRepository.GetInstructs();
+
+                if (!string.IsNullOrEmpty(search))
+                {
+                    courseList = courseList.Where(c => c.CourseName.IndexOf(search, StringComparison.OrdinalIgnoreCase) >= 0).ToList();
+                }
+                
+                ModelsView modelsView = new ModelsView
+                {
+                    CourseList = courseList.ToList(),
+                    ChaptersList = chapterList.ToList(),
+                    CategoriesList = categoryList.ToList(),
+                    Instructor = instructor,
+                    InstructsList = instructList.ToList(),
+                };
+
+                ViewBag.Search = search;
+                ViewBag.CurrentPage = page;
+                ViewBag.InstructorID = id;
+
+                return View(modelsView);
             }
-
-            if (!string.IsNullOrEmpty(search))
+            catch (Exception ex)
             {
-                courseList = courseList.Where(i => i.CourseName.IndexOf(search, StringComparison.OrdinalIgnoreCase) >= 0).ToList();
+                ViewBag.ErrorMessage = "An error occurred while processing your request.";
+                return View();
             }
-
-            ViewBag.Search = search;
-            var totalCount = courseList.Count();
-            var totalPages = (int)Math.Ceiling((double)totalCount / pageSize);
-
-            // courseList = courseList.Skip((page - 1) * pageSize).Take(pageSize).ToList();
-
-            ViewBag.PageSize = pageSize;
-            ViewBag.TotalPages = totalPages;
-            ViewBag.Quantity = totalCount;
-            ViewBag.CurrentPage = page;
-            return View(Tuple.Create(courseList, chapterList, categoryList, instructor, instruct));
         }
 
 
-        
         public ActionResult Detail(int? id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-            var course= courseRepository.GetCourseByID(id.Value);
+            if (id == null) return NotFound();
+
+            var course = courseRepository.GetCourseByID(id.Value);
             var chapterList = chapterRepository.GetChapters();
             var lessonList = lessonRepository.GetLessons();
             var categoryList = categoryRepository.GetCategorys();
             var instruct = instructRepository.GetInstructs();
-            if (course== null)
+            if (course == null)
             {
                 return NotFound();
-
             }
             return View(Tuple.Create(course, chapterList, categoryList, instruct, lessonList));
         }
-  
+
         public ActionResult Create()
         {
             var categoryList = categoryRepository.GetCategorys();
@@ -101,12 +111,6 @@ namespace Project_Group3.Controllers
             {
                 if (ModelState.IsValid)
                 {
-                    // Check other conditions
-                    if (course.StartDate > course.EndDate)
-                    {
-                        ModelState.AddModelError("StartDate", "Start date must be earlier than end date.");
-                        ModelState.AddModelError("EndDate", "End date must be later than start date.");
-                    }
 
                     // Add conditions for additional properties
                     if (string.IsNullOrEmpty(course.CourseName))
@@ -124,19 +128,9 @@ namespace Project_Group3.Controllers
                         ModelState.AddModelError("Picture", "Picture is required.");
                     }
 
-                    if (course.TotalTime == null)
-                    {
-                        ModelState.AddModelError("TotalTime", "Total time is required.");
-                    }
-
                     if (course.Price == null)
                     {
                         ModelState.AddModelError("Price", "Price is required.");
-                    }
-
-                    if (string.IsNullOrEmpty(course.Status))
-                    {
-                        ModelState.AddModelError("Status", "Status is required.");
                     }
 
                     if (ModelState.IsValid)
@@ -152,15 +146,20 @@ namespace Project_Group3.Controllers
                             picture.CopyTo(stream);
                         }
 
-                        // Update the course object with the new image path
                         course.Picture = Path.Combine(urlRelative, fileName);
-
+                        course.Status = "Wait";
                         courseRepository.InsertCourse(course);
+
+                        var ins = instructorRepository.GetInstructorByID(HttpContext.Session.GetInt32("InsID").GetValueOrDefault());
+
+                        Instruct instruct = new Instruct { CourseId = course.CourseId, InstructorId = ins.InstructorId };
+
+                        System.Console.WriteLine(instruct.InstructorId);
+                        instructRepository.InsertInstruct(instruct);
                         return RedirectToAction("Create", "Chapter", new { courseId = course.CourseId });
                     }
                 }
-
-                ViewBag.CategoryId = course.CategoryId; // Truyền CategoryId vào ViewBag
+                ViewBag.CategoryId = course.CategoryId;
                 var categoryList = categoryRepository.GetCategorys();
                 ViewBag.CategoryList = new SelectList(categoryList, "CategoryId", "CategoryName");
                 return View(course);
@@ -172,76 +171,91 @@ namespace Project_Group3.Controllers
             }
         }
 
-        
-        // public IActionResult Edit(int id)
-        // {
-        //   System.Console.WriteLine(id);
-        //     return View();
-        // }
-        
-        
+
         public ActionResult Edit(int? id)
         {
-            if (id == null)
+            if (id == null) return NotFound();
+
+            var Course = courseRepository.GetCourseByID(id.Value);
+
+            if (Course == null) return NotFound();
+
+            ModelsView modelsView = new ModelsView
             {
-                return NotFound();
-            }
-            var Course= courseRepository.GetCourseByID(id.Value);
-            if (Course== null)
-            {
-                return NotFound();
-            }
-            return View(Course);
+                Course = Course,
+            };
+            ViewBag.CategoryId = Course.CategoryId;
+            var categoryList = categoryRepository.GetCategorys();
+            ViewBag.CategoryList = new SelectList(categoryList, "CategoryId", "CategoryName");
+            return View(modelsView);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, Course course)
+        public ActionResult Edit(ModelsView modelsView)
         {
             try
             {
-                if (id != course.CourseId)
+
+                var course = courseRepository.GetCourseByID(modelsView.Course.CourseId);
+                if (course != null)
                 {
-                    return NotFound();
+                    if (ModelState.IsValid)
+                    {
+                        course.CreationDate = DateTime.Now;
+                        courseRepository.UpdateCourse(modelsView.Course);
+                    }
+                    return RedirectToAction("Index", new { id = Request.Cookies["ID"] });
                 }
-                if (ModelState.IsValid)
-                {
-                    courseRepository.UpdateCourse(course);
-                }
-                return RedirectToAction(nameof(Index));
+                return View(modelsView);
             }
             catch (Exception ex)
             {
                 ViewBag.Message = ex.Message;
                 return View();
+            }
+        }
 
-            }
-        }
         public ActionResult Delete(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-            var course= courseRepository.GetCourseByID(id.Value);
-            if (course== null)
-            {
-                return NotFound();
-            }
-            return View(course);
-        }
-        //Post Learnercontroller/delete/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id)
         {
             try
             {
-                courseRepository.DeleteCourse(id);
-                return RedirectToAction(nameof(Index));
+                if (id == null) return NotFound();
+
+                var course = courseRepository.GetCourseByID(id.Value);
+
+                if (course == null) return NotFound();
+
+                ViewBag.CategoryId = course.CategoryId;
+                var categoryList = categoryRepository.GetCategorys();
+                ViewBag.CategoryList = new SelectList(categoryList, "CategoryId", "CategoryName");
+
+                return View(new ModelsView { Course = course });
             }
             catch (Exception ex)
+            {
+                ViewBag.ErrorMessage = "An error occurred while processing your request.";
+                return View();
+            }
+        }
 
+
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult Delete(ModelsView modelsView)
+        {
+            try
+            {
+                var course = courseRepository.GetCourseByID(modelsView.Course.CourseId);
+                if (course != null)
+                {
+                    courseRepository.DeleteCourse(course.CourseId);
+                    return RedirectToAction("Index", new { id = Request.Cookies["ID"] });
+                }
+                return NotFound();
+            }
+            catch (Exception ex)
             {
                 ViewBag.Message = ex.Message;
                 return View();

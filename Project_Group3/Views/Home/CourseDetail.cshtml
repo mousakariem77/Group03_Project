@@ -4,7 +4,7 @@
     ViewData["Title"] = "Course Detail";
     Layout = "~/Views/Shared/_LayoutHome.cshtml";
 }
-<link rel="stylesheet" href="/wwwroot/css/site.css" />
+<link rel="stylesheet" href="/wwwroot/css/style.css" />
 <link rel="stylesheet" href="~/fonts/boxicons.css" />
 
 <!-- Welcome Start -->
@@ -108,34 +108,19 @@
                     @{
                         var role = Context.Request.Cookies["Role"];
                         var LearnerID = int.Parse(Context.Request.Cookies["ID"]);
-                        int findCourse = 0;
+                        bool findCourse = false;
                         foreach(var enrollment in Model.Item7){
                             if(Model.Item1.CourseId == enrollment.CourseId){
-                                findCourse++;
+                                findCourse = true;
                             }
                         }
-                        if(findCourse == 0){
+                        if(findCourse == false){
                             if(role != null){
-                                <a class="btn btn-warning mr-2" href="@Url.Action("Index", "Payment", new { learnerId = LearnerID, courseId = Model.Item1.CourseId })" title="Edit">
-                                    <button class="erroll-btn btn btn-warning">
-                                        <h5>Enroll</h5>
-                                        <label>Starts March 1</label>
-                                    </button>
-                                </a>
-                            }else{
-                                <a class="erroll-btn btn btn-warning" asp-controller="User" asp-action="Login">
-                                    <h6 class="text-theme">Please login to continue</h6>
-                                    <label class="text-theme">Starts March 1</label>
-                                </a>
-                            }
-                        }else{
-                            foreach(var enrollment in Model.Item7){
-                                if(LearnerID == enrollment.LearnerId && Model.Item1.CourseId == enrollment.CourseId && enrollment.IsPaid == true){
-                                    <a class="erroll-btn btn btn-warning">
-                                        <h6 class="text-theme">Already Enrolled</h6>
+                                if(role == "instructor"){
+                                    <a class="erroll-btn btn btn-warning" asp-controller="User" asp-action="Login">
+                                        <h6 class="text-theme">Become an account learner</h6>
                                     </a>
-                                    break;
-                                }else{
+                                }else if(role == "learner"){
                                     <a class="btn btn-warning mr-2" href="@Url.Action("Index", "Payment", new { learnerId = LearnerID, courseId = Model.Item1.CourseId })" title="Edit">
                                         <button class="erroll-btn btn btn-warning">
                                             <h5>Enroll</h5>
@@ -143,13 +128,31 @@
                                         </button>
                                     </a>
                                 }
+                            }else{
+                                <a class="erroll-btn btn btn-warning" asp-controller="User" asp-action="Login">
+                                    <h6 class="text-theme">Please login to continue</h6>
+                                </a>
+                            }
+                        }else{
+                            foreach(var enrollment in Model.Item7){
+                                if(LearnerID == enrollment.LearnerId && Model.Item1.CourseId == enrollment.CourseId){
+                                    if(enrollment.IsPaid == true){
+                                        <a class="erroll-btn btn btn-warning">
+                                            <h6 class="text-theme mt-3">Already Enrolled</h6>
+                                        </a>
+                                        break;
+                                    }else{
+                                        <a class="btn btn-warning mr-2" href="@Url.Action("Index", "Payment", new { learnerId = LearnerID, courseId = Model.Item1.CourseId })" title="Edit">
+                                            <button class="erroll-btn btn btn-warning">
+                                                <h5>Enroll</h5>
+                                                <label>Starts March 2</label>
+                                            </button>
+                                        </a>
+                                        break;
+                                    }
+                                }
                             }
                         }
-
-
-
-
-
                     }
                 </div>
                 <h6 class="text-white ml-4 pt-4">
@@ -232,7 +235,6 @@
                 </p>
             </div>
 
-            <!-- List of Chapter Start-->
             @{
                 foreach(var chapter in Model.Item5){
                     if(chapter.CourseId == Model.Item1.CourseId){
@@ -260,24 +262,69 @@
                                 <div class="row">
                                     <div class="col-lg-12 col-md-12">
                                         <div class="box-chaper mb-2">
-                                            <div class=" d-flex">
+                                            <div class="">
                                                 @{
+                                                    bool tmp = false;
                                                     foreach(var lesson in Model.Item6){
                                                         if(chapter.ChapterId == lesson.ChapterId){
                                                             if(role != null){
-                                                                <a href="/Home/Learning/@lesson.LessonId" class="d-flex justify-content-between">
-                                                                    <div class="lesson-item d-flex ml-4">
-                                                                        <i class='text-primary bx bxs-caret-right-circle mr-1 mt-3 ml-3'></i>
-                                                                        <h6 class="pt-3">@lesson.Index. @lesson.LessonName</h6>
-                                                                    </div>
-                                                                    @{
-                                                                        int? hourLesson = @lesson.Time / 60; // Số giờ
-                                                                        int? minuteLesson = @lesson.Time % 60; // Số phút
+                                                                if(role == "learner"){
+                                                                    var idLearner = int.Parse(Context.Request.Cookies["ID"]);
+
+                                                                    foreach(var enrollment in Model.Item7){
+                                                                        if(idLearner == enrollment.LearnerId){
+                                                                            if(enrollment.IsPaid == true){
+                                                                                tmp = true;
+                                                                                break;
+                                                                            }    
+                                                                        }
                                                                     }
-                                                                    <p class="quanity-lesson text-end mt-2 ml-5">@hourLesson : @minuteLesson</p>
-                                                                </a>
+                                                                    if(tmp == true){
+                                                                        <a href="/Home/Learning/@lesson.LessonId" class="d-flex justify-content-between mb-2">
+                                                                            <div class="lesson-item d-flex ml-4">
+                                                                                <i class='text-primary bx bxs-caret-right-circle mr-1 mt-3 ml-3'></i>
+                                                                                <h6 class="pt-3">@lesson.Index. @lesson.LessonName</h6>
+                                                                            </div>
+                                                                            @{
+                                                                                int? hourLesson = @lesson.Time / 60; // Số giờ
+                                                                                int? minuteLesson = @lesson.Time % 60; // Số phút
+                                                                            }
+                                                                            <div class="div">
+                                                                                <p class="quanity-lesson text-end mt-2 ml-5 mr-3">@hourLesson : @minuteLesson</p>
+                                                                            </div>
+                                                                        </a>
+                                                                    }else{
+                                                                        <a href="javascript:void(0);" class="d-flex justify-content-between mb-2">
+                                                                            <div class="lesson-item d-flex ml-4">
+                                                                                <i class='text-primary bx bxs-caret-right-circle mr-1 mt-3 ml-3'></i>
+                                                                                <h6 class="pt-3">@lesson.Index. @lesson.LessonName</h6>
+                                                                            </div>
+                                                                            @{
+                                                                                int? hourLesson = @lesson.Time / 60; // Số giờ
+                                                                                int? minuteLesson = @lesson.Time % 60; // Số phút
+                                                                            }
+                                                                            <div class="div">
+                                                                                <p class="quanity-lesson text-end mt-2 ml-5 mr-3">@hourLesson : @minuteLesson</p>
+                                                                            </div>
+                                                                        </a>
+                                                                    }
+                                                                }else if(role == "instructor"){
+                                                                    <a href="javascript:void(0);" class="d-flex justify-content-between mb-2">
+                                                                        <div class="lesson-item d-flex ml-4">
+                                                                            <i class='text-primary bx bxs-caret-right-circle mr-1 mt-3 ml-3'></i>
+                                                                            <h6 class="pt-3">@lesson.Index. @lesson.LessonName</h6>
+                                                                        </div>
+                                                                        @{
+                                                                            int? hourLesson = @lesson.Time / 60; // Số giờ
+                                                                            int? minuteLesson = @lesson.Time % 60; // Số phút
+                                                                        }
+                                                                        <div class="div">
+                                                                            <p class="quanity-lesson text-end mt-2 ml-5 mr-3">@hourLesson : @minuteLesson</p>
+                                                                        </div>
+                                                                    </a>
+                                                                }
                                                             }else{
-                                                                <a href="javascript:void(0);" class="d-flex justify-content-between">
+                                                                <a href="javascript:void(0);" class="d-flex justify-content-between mb-2">
                                                                     <div class="lesson-item d-flex ml-4">
                                                                         <i class='text-primary bx bxs-caret-right-circle mr-1 mt-3 ml-3'></i>
                                                                         <h6 class="pt-3">@lesson.Index. @lesson.LessonName</h6>
@@ -286,7 +333,9 @@
                                                                         int? hourLesson = @lesson.Time / 60; // Số giờ
                                                                         int? minuteLesson = @lesson.Time % 60; // Số phút
                                                                     }
-                                                                    <p class="quanity-lesson text-end mt-2 ml-5">@hourLesson : @minuteLesson</p>
+                                                                    <div class="div">
+                                                                        <p class="quanity-lesson text-end mt-2 ml-5 mr-3">@hourLesson : @minuteLesson</p>
+                                                                    </div>
                                                                 </a>
                                                             }
                                                         }

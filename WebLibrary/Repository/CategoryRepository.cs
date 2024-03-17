@@ -15,4 +15,4 @@ namespace WebLibrary.Repository
         public void DeleteCategory(int categoryId) => CategoryDAO.Instance.Remove(categoryId);
         public void UpdateCategory(Category category) => CategoryDAO.Instance.Update(category); 
     }
-}
+} 

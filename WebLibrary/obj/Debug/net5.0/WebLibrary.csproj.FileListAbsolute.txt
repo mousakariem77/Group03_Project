@@ -13,3 +13,4 @@ D:\Group03_Project\WebLibrary\obj\Debug\net5.0\refint\WebLibrary.dll
 D:\Group03_Project\WebLibrary\obj\Debug\net5.0\WebLibrary.pdb
 D:\Group03_Project\WebLibrary\obj\Debug\net5.0\WebLibrary.genruntimeconfig.cache
 D:\Group03_Project\WebLibrary\obj\Debug\net5.0\ref\WebLibrary.dll
+D:\Group03_Project\WebLibrary\obj\Debug\net5.0\WebLibrary.sourcelink.json

@@ -28,7 +28,7 @@ namespace WebLibrary.DAO
         public IEnumerable<Admin> GetAdminlist()
         {
             var admins = new List<Admin>();
-            try
+            try 
             {
                 using var context = new DBContext();
                 admins = context.Admins.ToList();
@@ -36,8 +36,6 @@ namespace WebLibrary.DAO
             catch (Exception ex)
             {
                 throw new Exception(ex.Message);
-
-                throw;
             }
             return admins;
         }

@@ -6,7 +6,7 @@
     <title>@ViewData["Title"]</title>
     <link rel="icon" type="image/x-icon" href="~/icon.ico" />
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="~/css/site.css" />
+    <link rel="stylesheet" href="~/css/style.css" />
 </head>
 <body onload="time()">
     <div class="container-fluid">
@@ -86,10 +86,9 @@
                                         <li class="nav-item ">
                                             <div id="clock" class="text-theme"></div>
                                         </li>
-                                        <li class="nav-item ml-3">
-                                            <a href="#" class="icon-taskbar theme-toggle">
-                                                <i class='bx bx-sun text-theme' title="Light Mode"></i>
-                                                <i class='bx bx-moon text-theme'title="Dark Mode"></i>
+                                        <li class="nav-item mr-3 mt-1">
+                                            <a class="notifi-icon" asp-controller="Home" asp-action="QA">
+                                                <i class="tf-icons bx bx-buld text-theme" style="font-size: 2rem;"></i>
                                             </a>
                                         </li>
                                         <li class="nav-item ml-3">
@@ -121,7 +120,7 @@
                                                     </li>
                                                     <li>
                                                         <a class="p-2 dropdown-item text-theme mt-2" asp-controller="Home"
-                                                            asp-action="Profile">
+                                                            asp-action="InstructorProfile">
                                                             <i class="bx bx-user me-2"></i>
                                                             <span class="align-middle">My Profile</span>
                                                         </a>

@@ -18,13 +18,23 @@ namespace WebLibrary.Models
         }
 
         public virtual DbSet<Admin> Admins { get; set; }
+        public virtual DbSet<Answer> Answers { get; set; }
         public virtual DbSet<Category> Categories { get; set; }
         public virtual DbSet<Chapter> Chapters { get; set; }
+        public virtual DbSet<ChapterProgress> ChapterProgresses { get; set; }
         public virtual DbSet<Course> Courses { get; set; }
+        public virtual DbSet<CourseProgress> CourseProgresses { get; set; }
+        public virtual DbSet<Enrollment> Enrollments { get; set; }
         public virtual DbSet<Instruct> Instructs { get; set; }
         public virtual DbSet<Instructor> Instructors { get; set; }
         public virtual DbSet<Learner> Learners { get; set; }
         public virtual DbSet<Lesson> Lessons { get; set; }
+        public virtual DbSet<LessonProgress> LessonProgresses { get; set; }
+        public virtual DbSet<Quiz> Quizzes { get; set; }
+        public virtual DbSet<Report> Reports { get; set; }
+        public virtual DbSet<Review> Reviews { get; set; }
+        public virtual DbSet<Voucher> Vouchers { get; set; }
+        public virtual DbSet<VoucherUsage> VoucherUsages { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -54,6 +64,17 @@ namespace WebLibrary.Models
                     .HasMaxLength(50)
                     .IsUnicode(false)
                     .HasColumnName("username");
+            });
+
+            modelBuilder.Entity<Answer>(entity =>
+            {
+                entity.ToTable("answer");
+
+                entity.Property(e => e.AnswerId).HasColumnName("answerID");
+
+                entity.Property(e => e.Answer1)
+                    .HasMaxLength(1)
+                    .HasColumnName("answer");
             });
 
             modelBuilder.Entity<Category>(entity =>
@@ -99,6 +120,44 @@ namespace WebLibrary.Models
                     .HasConstraintName("FK__chapter__courseI__48CFD27E");
             });
 
+            modelBuilder.Entity<ChapterProgress>(entity =>
+            {
+                entity.ToTable("chapter_progress");
+
+                entity.Property(e => e.ChapterProgressId).HasColumnName("chapter_progressID");
+
+                entity.Property(e => e.ChapterId).HasColumnName("chapterID");
+
+                entity.Property(e => e.Completed)
+                    .HasColumnName("completed")
+                    .HasDefaultValueSql("((0))");
+
+                entity.Property(e => e.CourseProgressId).HasColumnName("course_progressID");
+
+                entity.Property(e => e.ProgressPercent)
+                    .HasColumnName("progress_percent")
+                    .HasDefaultValueSql("((0))");
+
+                entity.Property(e => e.StartAt)
+                    .HasColumnType("datetime")
+                    .HasColumnName("start_at")
+                    .HasDefaultValueSql("(getdate())");
+
+                entity.Property(e => e.TotalTime)
+                    .HasColumnName("total_time")
+                    .HasDefaultValueSql("((0))");
+
+                entity.HasOne(d => d.Chapter)
+                    .WithMany(p => p.ChapterProgresses)
+                    .HasForeignKey(d => d.ChapterId)
+                    .HasConstraintName("FK__chapter_p__chapt__70DDC3D8");
+
+                entity.HasOne(d => d.CourseProgress)
+                    .WithMany(p => p.ChapterProgresses)
+                    .HasForeignKey(d => d.CourseProgressId)
+                    .HasConstraintName("FK__chapter_p__cours__71D1E811");
+            });
+
             modelBuilder.Entity<Course>(entity =>
             {
                 entity.ToTable("courses");
@@ -111,13 +170,13 @@ namespace WebLibrary.Models
                     .HasMaxLength(255)
                     .HasColumnName("course_name");
 
+                entity.Property(e => e.CreationDate)
+                    .HasColumnType("date")
+                    .HasColumnName("creation_date");
+
                 entity.Property(e => e.Description)
                     .HasColumnType("ntext")
                     .HasColumnName("description");
-
-                entity.Property(e => e.EndDate)
-                    .HasColumnType("date")
-                    .HasColumnName("endDate");
 
                 entity.Property(e => e.Picture)
                     .HasColumnType("text")
@@ -126,10 +185,6 @@ namespace WebLibrary.Models
                 entity.Property(e => e.Price)
                     .HasColumnType("money")
                     .HasColumnName("price");
-
-                entity.Property(e => e.StartDate)
-                    .HasColumnType("date")
-                    .HasColumnName("startDate");
 
                 entity.Property(e => e.Status)
                     .HasMaxLength(30)
@@ -145,11 +200,97 @@ namespace WebLibrary.Models
                     .HasConstraintName("FK__courses__categor__403A8C7D");
             });
 
+            modelBuilder.Entity<CourseProgress>(entity =>
+            {
+                entity.ToTable("course_progress");
+
+                entity.Property(e => e.CourseProgressId).HasColumnName("course_progressID");
+
+                entity.Property(e => e.Completed)
+                    .HasColumnName("completed")
+                    .HasDefaultValueSql("((0))");
+
+                entity.Property(e => e.CourseId).HasColumnName("courseID");
+
+                entity.Property(e => e.LearnerId).HasColumnName("learnerID");
+
+                entity.Property(e => e.ProgressPercent)
+                    .HasColumnName("progress_percent")
+                    .HasDefaultValueSql("((0))");
+
+                entity.Property(e => e.Rated)
+                    .HasColumnName("rated")
+                    .HasDefaultValueSql("((0))");
+
+                entity.Property(e => e.StartAt)
+                    .HasColumnType("datetime")
+                    .HasColumnName("start_at")
+                    .HasDefaultValueSql("(getdate())");
+
+                entity.Property(e => e.TotalTime)
+                    .HasColumnName("total_time")
+                    .HasDefaultValueSql("((0))");
+
+                entity.HasOne(d => d.Course)
+                    .WithMany(p => p.CourseProgresses)
+                    .HasForeignKey(d => d.CourseId)
+                    .HasConstraintName("FK__course_pr__cours__6A30C649");
+
+                entity.HasOne(d => d.Learner)
+                    .WithMany(p => p.CourseProgresses)
+                    .HasForeignKey(d => d.LearnerId)
+                    .HasConstraintName("FK__course_pr__learn__693CA210");
+            });
+
+            modelBuilder.Entity<Enrollment>(entity =>
+            {
+                entity.ToTable("enrollment");
+
+                entity.Property(e => e.EnrollmentId).HasColumnName("enrollmentID");
+
+                entity.Property(e => e.CourseId).HasColumnName("courseID");
+
+                entity.Property(e => e.CourseName)
+                    .IsRequired()
+                    .HasMaxLength(50)
+                    .HasColumnName("courseName");
+
+                entity.Property(e => e.Email)
+                    .IsRequired()
+                    .HasMaxLength(50)
+                    .HasColumnName("email");
+
+                entity.Property(e => e.EnrollmentDate)
+                    .HasColumnType("date")
+                    .HasColumnName("enrollmentDate");
+
+                entity.Property(e => e.IsPaid).HasColumnName("isPaid");
+
+                entity.Property(e => e.LearnerId).HasColumnName("learnerID");
+
+                entity.Property(e => e.LearnerName)
+                    .IsRequired()
+                    .HasMaxLength(50)
+                    .HasColumnName("learnerName");
+
+                entity.HasOne(d => d.Course)
+                    .WithMany(p => p.Enrollments)
+                    .HasForeignKey(d => d.CourseId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK__enrollmen__cours__571DF1D5");
+
+                entity.HasOne(d => d.Learner)
+                    .WithMany(p => p.Enrollments)
+                    .HasForeignKey(d => d.LearnerId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK__enrollmen__learn__5629CD9C");
+            });
+
             modelBuilder.Entity<Instruct>(entity =>
             {
                 entity.ToTable("instruct");
 
-                entity.HasIndex(e => new { e.InstructorId, e.CourseId }, "UQ__instruct__029B7EDA66807850")
+                entity.HasIndex(e => new { e.InstructorId, e.CourseId }, "UQ__instruct__029B7EDABB306642")
                     .IsUnique();
 
                 entity.Property(e => e.InstructId).HasColumnName("instructID");
@@ -293,10 +434,6 @@ namespace WebLibrary.Models
                     .HasMaxLength(50)
                     .IsUnicode(false)
                     .HasColumnName("username");
-
-                entity.Property(e => e.Wallet)
-                    .HasColumnType("money")
-                    .HasColumnName("wallet");
             });
 
             modelBuilder.Entity<Lesson>(entity =>
@@ -311,6 +448,8 @@ namespace WebLibrary.Models
                     .HasColumnType("ntext")
                     .HasColumnName("content");
 
+                entity.Property(e => e.CourseId).HasColumnName("courseID");
+
                 entity.Property(e => e.Description)
                     .HasColumnType("ntext")
                     .HasColumnName("description");
@@ -321,10 +460,6 @@ namespace WebLibrary.Models
                     .HasMaxLength(50)
                     .HasColumnName("lesson_name");
 
-                entity.Property(e => e.MustBeCompleted)
-                    .HasColumnName("must_be_completed")
-                    .HasDefaultValueSql("((1))");
-
                 entity.Property(e => e.PercentToPassed)
                     .HasColumnName("percent_to_passed")
                     .HasDefaultValueSql("((80))");
@@ -333,12 +468,205 @@ namespace WebLibrary.Models
                     .HasColumnName("time")
                     .HasDefaultValueSql("((0))");
 
-                entity.Property(e => e.Type).HasColumnName("type");
-
                 entity.HasOne(d => d.Chapter)
                     .WithMany(p => p.Lessons)
                     .HasForeignKey(d => d.ChapterId)
-                    .HasConstraintName("FK__lesson__chapterI__4E88ABD4");
+                    .HasConstraintName("FK__lesson__chapterI__4D94879B");
+
+                entity.HasOne(d => d.Course)
+                    .WithMany(p => p.Lessons)
+                    .HasForeignKey(d => d.CourseId)
+                    .HasConstraintName("FK__lesson__courseID__4E88ABD4");
+            });
+
+            modelBuilder.Entity<LessonProgress>(entity =>
+            {
+                entity.ToTable("lesson_progress");
+
+                entity.Property(e => e.LessonProgressId).HasColumnName("lesson_progressID");
+
+                entity.Property(e => e.ChapterProgressId).HasColumnName("chapter_progressID");
+
+                entity.Property(e => e.Completed)
+                    .HasColumnName("completed")
+                    .HasDefaultValueSql("((0))");
+
+                entity.Property(e => e.LessonId).HasColumnName("lessonID");
+
+                entity.Property(e => e.ProgressPercent)
+                    .HasColumnName("progress_percent")
+                    .HasDefaultValueSql("((0))");
+
+                entity.Property(e => e.StartAt)
+                    .HasColumnType("datetime")
+                    .HasColumnName("start_at")
+                    .HasDefaultValueSql("(getdate())");
+
+                entity.HasOne(d => d.ChapterProgress)
+                    .WithMany(p => p.LessonProgresses)
+                    .HasForeignKey(d => d.ChapterProgressId)
+                    .HasConstraintName("FK__lesson_pr__chapt__787EE5A0");
+
+                entity.HasOne(d => d.Lesson)
+                    .WithMany(p => p.LessonProgresses)
+                    .HasForeignKey(d => d.LessonId)
+                    .HasConstraintName("FK__lesson_pr__lesso__778AC167");
+            });
+
+            modelBuilder.Entity<Quiz>(entity =>
+            {
+                entity.ToTable("quiz");
+
+                entity.Property(e => e.QuizId).HasColumnName("quizID");
+
+                entity.Property(e => e.AnswerId).HasColumnName("answerID");
+
+                entity.Property(e => e.ChapterId).HasColumnName("chapterID");
+
+                entity.Property(e => e.CourseId).HasColumnName("courseID");
+
+                entity.Property(e => e.DapAnA)
+                    .HasMaxLength(250)
+                    .HasColumnName("dap_an_a");
+
+                entity.Property(e => e.DapAnB)
+                    .HasMaxLength(250)
+                    .HasColumnName("dap_an_b");
+
+                entity.Property(e => e.DapAnC)
+                    .HasMaxLength(250)
+                    .HasColumnName("dap_an_c");
+
+                entity.Property(e => e.DapAnD)
+                    .HasMaxLength(250)
+                    .HasColumnName("dap_an_d");
+
+                entity.Property(e => e.Note)
+                    .HasMaxLength(250)
+                    .HasColumnName("note");
+
+                entity.Property(e => e.Quiz1)
+                    .HasMaxLength(250)
+                    .HasColumnName("quiz");
+
+                entity.HasOne(d => d.Answer)
+                    .WithMany(p => p.Quizzes)
+                    .HasForeignKey(d => d.AnswerId)
+                    .HasConstraintName("FK__quiz__answerID__60A75C0F");
+
+                entity.HasOne(d => d.Chapter)
+                    .WithMany(p => p.Quizzes)
+                    .HasForeignKey(d => d.ChapterId)
+                    .HasConstraintName("FK__quiz__chapterID__5FB337D6");
+
+                entity.HasOne(d => d.Course)
+                    .WithMany(p => p.Quizzes)
+                    .HasForeignKey(d => d.CourseId)
+                    .HasConstraintName("FK__quiz__courseID__5EBF139D");
+            });
+
+            modelBuilder.Entity<Report>(entity =>
+            {
+                entity.ToTable("report");
+
+                entity.Property(e => e.ReportId).HasColumnName("reportID");
+
+                entity.Property(e => e.Content)
+                    .HasColumnType("text")
+                    .HasColumnName("content");
+
+                entity.Property(e => e.Email)
+                    .HasMaxLength(30)
+                    .IsUnicode(false)
+                    .HasColumnName("email");
+
+                entity.Property(e => e.Name)
+                    .HasMaxLength(100)
+                    .HasColumnName("name");
+
+                entity.Property(e => e.SubmittedTime)
+                    .HasColumnType("datetime")
+                    .HasColumnName("submitted_time");
+
+                entity.Property(e => e.Title)
+                    .HasColumnType("ntext")
+                    .HasColumnName("title");
+            });
+
+            modelBuilder.Entity<Review>(entity =>
+            {
+                entity.ToTable("review");
+
+                entity.Property(e => e.ReviewId).HasColumnName("reviewID");
+
+                entity.Property(e => e.Comment).HasColumnName("comment");
+
+                entity.Property(e => e.CourseId).HasColumnName("courseID");
+
+                entity.Property(e => e.LearnerId).HasColumnName("learnerID");
+
+                entity.Property(e => e.Rating).HasColumnName("rating");
+
+                entity.Property(e => e.ReviewDate)
+                    .HasColumnType("date")
+                    .HasColumnName("review_date");
+
+                entity.HasOne(d => d.Course)
+                    .WithMany(p => p.Reviews)
+                    .HasForeignKey(d => d.CourseId)
+                    .HasConstraintName("FK__review__courseID__52593CB8");
+
+                entity.HasOne(d => d.Learner)
+                    .WithMany(p => p.Reviews)
+                    .HasForeignKey(d => d.LearnerId)
+                    .HasConstraintName("FK__review__learnerI__534D60F1");
+            });
+
+            modelBuilder.Entity<Voucher>(entity =>
+            {
+                entity.ToTable("voucher");
+
+                entity.Property(e => e.VoucherId).HasColumnName("voucherID");
+
+                entity.Property(e => e.AdminId).HasColumnName("adminID");
+
+                entity.Property(e => e.CodeVoucher).HasMaxLength(50);
+
+                entity.Property(e => e.EndAt)
+                    .HasColumnType("datetime")
+                    .HasColumnName("end_at");
+
+                entity.Property(e => e.PercentDiscount).HasColumnName("percent_discount");
+
+                entity.Property(e => e.StartAt)
+                    .HasColumnType("datetime")
+                    .HasColumnName("start_at");
+
+                entity.HasOne(d => d.Admin)
+                    .WithMany(p => p.InverseAdmin)
+                    .HasForeignKey(d => d.AdminId)
+                    .HasConstraintName("FK__voucher__adminID__02FC7413");
+            });
+
+            modelBuilder.Entity<VoucherUsage>(entity =>
+            {
+                entity.ToTable("VoucherUsage");
+
+                entity.Property(e => e.CodeVoucher).HasMaxLength(50);
+
+                entity.Property(e => e.LearnerId).HasColumnName("learnerID");
+
+                entity.Property(e => e.VoucherId).HasColumnName("voucherID");
+
+                entity.HasOne(d => d.Learner)
+                    .WithMany(p => p.VoucherUsages)
+                    .HasForeignKey(d => d.LearnerId)
+                    .HasConstraintName("FK__VoucherUs__learn__05D8E0BE");
+
+                entity.HasOne(d => d.Voucher)
+                    .WithMany(p => p.VoucherUsages)
+                    .HasForeignKey(d => d.VoucherId)
+                    .HasConstraintName("FK__VoucherUs__vouch__06CD04F7");
             });
 
             OnModelCreatingPartial(modelBuilder);

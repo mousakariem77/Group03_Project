@@ -118,10 +118,6 @@ namespace WebLibrary.Models
                     .HasColumnType("ntext")
                     .HasColumnName("description");
 
-                entity.Property(e => e.EndDate)
-                    .HasColumnType("date")
-                    .HasColumnName("endDate");
-
                 entity.Property(e => e.Picture)
                     .HasColumnType("text")
                     .HasColumnName("picture");
@@ -129,10 +125,6 @@ namespace WebLibrary.Models
                 entity.Property(e => e.Price)
                     .HasColumnType("money")
                     .HasColumnName("price");
-
-                entity.Property(e => e.StartDate)
-                    .HasColumnType("date")
-                    .HasColumnName("startDate");
 
                 entity.Property(e => e.Status)
                     .IsRequired()
@@ -313,9 +305,6 @@ namespace WebLibrary.Models
                     .IsUnicode(false)
                     .HasColumnName("username");
 
-                entity.Property(e => e.Wallet)
-                    .HasColumnType("money")
-                    .HasColumnName("wallet");
             });
 
             modelBuilder.Entity<Lesson>(entity =>
@@ -340,10 +329,6 @@ namespace WebLibrary.Models
                     .HasMaxLength(50)
                     .HasColumnName("lesson_name");
 
-                entity.Property(e => e.MustBeCompleted)
-                    .HasColumnName("must_be_completed")
-                    .HasDefaultValueSql("((1))");
-
                 entity.Property(e => e.PercentToPassed)
                     .HasColumnName("percent_to_passed")
                     .HasDefaultValueSql("((80))");
@@ -351,8 +336,6 @@ namespace WebLibrary.Models
                 entity.Property(e => e.Time)
                     .HasColumnName("time")
                     .HasDefaultValueSql("((0))");
-
-                entity.Property(e => e.Type).HasColumnName("type");
 
                 entity.HasOne(d => d.Chapter)
                     .WithMany(p => p.Lessons)
