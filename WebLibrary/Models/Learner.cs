@@ -7,6 +7,14 @@ namespace WebLibrary.Models
 {
     public partial class Learner
     {
+        public Learner()
+        {
+            CourseProgresses = new HashSet<CourseProgress>();
+            Enrollments = new HashSet<Enrollment>();
+            Reviews = new HashSet<Review>();
+            VoucherUsages = new HashSet<VoucherUsage>();
+        }
+
         public int LearnerId { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
@@ -19,7 +27,11 @@ namespace WebLibrary.Models
         public string Password { get; set; }
         public string Picture { get; set; }
         public DateTime? RegistrationDate { get; set; }
-        public decimal? Wallet { get; set; }
         public string Status { get; set; }
+
+        public virtual ICollection<CourseProgress> CourseProgresses { get; set; }
+        public virtual ICollection<Enrollment> Enrollments { get; set; }
+        public virtual ICollection<Review> Reviews { get; set; }
+        public virtual ICollection<VoucherUsage> VoucherUsages { get; set; }
     }
 }

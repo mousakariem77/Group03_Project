@@ -1,18 +1,21 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Project_Group3.Models;
 using WebLibrary.Models;
 using WebLibrary.Repository;
 namespace Project_Group3.Controllers
 {
-   
+
     public class LessonController : Controller
     {
-       
+
         ILessonRepository lessonRepository = null;
         IChapterRepository chapterRepository = null;
         ICourseRepository courseRepository = null;
@@ -24,7 +27,7 @@ namespace Project_Group3.Controllers
         }
 
 
-        public ActionResult Index(int chapterId, int courseId)
+        public ActionResult Index(int chapterId, int courseId, string search = "")
         {
 
             var chapter = chapterRepository.GetChapterByID(chapterId);
@@ -34,11 +37,17 @@ namespace Project_Group3.Controllers
 
             ViewBag.ChapterName = chapter.ChapterName;
             ViewBag.CourseName = course.CourseName;
-            // Lấy danh sách tất cả các chương từ repository
+
             var lessonList = lessonRepository.GetLessons();
 
             // Tìm tất cả các chương có CourseId trùng khớp với courseId
             var lessonsToDisplay = lessonList.Where(l => l.ChapterId == chapterId && l.CourseId == courseId).ToList();
+
+            if (!string.IsNullOrEmpty(search))
+            {
+                lessonsToDisplay = lessonsToDisplay.Where(l => l.LessonName.IndexOf(search, StringComparison.OrdinalIgnoreCase) >= 0).ToList();
+            }
+            ViewBag.Search = search;
 
             // Trả về view, truyền danh sách chương để hiển thị
             return View(lessonsToDisplay);
@@ -50,8 +59,8 @@ namespace Project_Group3.Controllers
             {
                 return NotFound();
             }
-            var Lesson= lessonRepository.GetLessonByID(id.Value);
-            if (Lesson== null)
+            var Lesson = lessonRepository.GetLessonByID(id.Value);
+            if (Lesson == null)
             {
                 return NotFound();
 
@@ -67,13 +76,13 @@ namespace Project_Group3.Controllers
             ViewBag.CourseId = courseId;
 
             ViewBag.ChapterName = chapter.ChapterName;
-             ViewBag.CourseName = course.CourseName;
+            ViewBag.CourseName = course.CourseName;
             return View();
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create(Lesson lesson, int chapterId, int courseId)
+        public ActionResult Create(Lesson lesson, int chapterId, int courseId, IFormFile video)
         {
             try
             {
@@ -85,55 +94,36 @@ namespace Project_Group3.Controllers
                         // Kiểm tra điều kiện cho thuộc tính Description
                         if (!string.IsNullOrEmpty(lesson.Description))
                         {
-                            // Kiểm tra điều kiện cho thuộc tính PercentToPassed
-                            if (lesson.PercentToPassed.HasValue && lesson.PercentToPassed.Value >= 0 && lesson.PercentToPassed.Value <= 100)
+                            // Kiểm tra điều kiện cho thuộc tính Index
+                            if (lesson.Index.HasValue && lesson.Index.Value > 0)
                             {
-                                // Kiểm tra điều kiện cho thuộc tính MustBeCompleted
-                                if (lesson.MustBeCompleted.HasValue)
+                                if (video == null || video.Length == 0)
                                 {
-                                    // Kiểm tra điều kiện cho thuộc tính Content
-                                    if (!string.IsNullOrEmpty(lesson.Content))
-                                    {
-                                        // Kiểm tra điều kiện cho thuộc tính Index
-                                        if (lesson.Index.HasValue && lesson.Index.Value > 0)
-                                        {
-                                            // Kiểm tra điều kiện cho thuộc tính Type
-                                            if (lesson.Type.HasValue)
-                                            {
-                                                // Kiểm tra điều kiện cho thuộc tính Time
-                                                if (lesson.Time.HasValue && lesson.Time.Value > 0)
-                                                {
-                                                    lessonRepository.InsertLesson(lesson);
-                                                    return RedirectToAction("Index", new { chapterId = chapterId, courseId = courseId });
-                                                }
-                                                else
-                                                {
-                                                    ModelState.AddModelError("Time", "Time must be a positive value.");
-                                                }
-                                            }
-                                            else
-                                            {
-                                                ModelState.AddModelError("Type", "Type is required.");
-                                            }
-                                        }
-                                        else
-                                        {
-                                            ModelState.AddModelError("Index", "Index must be a positive value.");
-                                        }
-                                    }
-                                    else
-                                    {
-                                        ModelState.AddModelError("Content", "Content is required.");
-                                    }
+                                    ModelState.AddModelError("Video", "Video is required.");
                                 }
-                                else
+
+                                if (ModelState.IsValid)
                                 {
-                                    ModelState.AddModelError("MustBeCompleted", "MustBeCompleted is required.");
+                                    // Handle the video file
+                                    var urlRelative = "/video/";
+                                    var urlAbsolute = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "video");
+                                    var fileName = Guid.NewGuid() + Path.GetExtension(video.FileName);
+                                    var filePath = Path.Combine(urlAbsolute, fileName);
+
+                                    using (var stream = new FileStream(filePath, FileMode.Create))
+                                    {
+                                        video.CopyTo(stream);
+                                    }
+
+                                    lesson.Content = Path.Combine(urlRelative, fileName);
+                                    lessonRepository.InsertLesson(lesson);
+
+                                    return RedirectToAction("Index", new { chapterId = chapterId, courseId = courseId });
                                 }
                             }
                             else
                             {
-                                ModelState.AddModelError("PercentToPassed", "PercentToPassed must ,be a value between 0 and 100.");
+                                ModelState.AddModelError("Index", "Index must be a positive value.");
                             }
                         }
                         else
@@ -158,74 +148,93 @@ namespace Project_Group3.Controllers
             ViewBag.ChapterName = chapter.ChapterName;
             return View(lesson);
         }
-        //Get CoureseController/Edit/5
+
 
         public ActionResult Edit(int? id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-            var Lesson= lessonRepository.GetLessonByID(id.Value);
-            if (Lesson== null)
-            {
-                return NotFound();
-            }
-            return View(Lesson);
+            if (id == null) return NotFound();
+
+            var Lesson = lessonRepository.GetLessonByID(id.Value);
+
+            if (Lesson == null) return NotFound();
+
+            return View(new ModelsView { Lesson = Lesson });
         }
-        //Post  Learnercontroller/edit/5
+
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, Lesson Lesson)
+        public ActionResult Edit(ModelsView modelsView, IFormFile video)
         {
             try
             {
-                if (id != Lesson.LessonId)
+                var lesson = lessonRepository.GetLessonByID(modelsView.Lesson.LessonId);
+                if (lesson != null)
                 {
-                    return NotFound();
+                    if (video != null && video.Length > 0)
+                    {
+                        // Handle the video file
+                        var urlRelative = "/video/";
+                        var urlAbsolute = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "video");
+                        var fileName = Guid.NewGuid() + Path.GetExtension(video.FileName);
+                        var filePath = Path.Combine(urlAbsolute, fileName);
+
+                        using (var stream = new FileStream(filePath, FileMode.Create))
+                        {
+                            video.CopyTo(stream);
+                        }
+
+                        lesson.Content = Path.Combine(urlRelative, fileName);
+                    }
+
+                    // Update other properties of the lesson
+                    lesson.LessonName = modelsView.Lesson.LessonName;
+                    lesson.Description = modelsView.Lesson.Description;
+                    lesson.Content = modelsView.Lesson.Content;
+                    lesson.Index = modelsView.Lesson.Index;
+
+                    lessonRepository.UpdateLesson(lesson);
+                    return RedirectToAction("Index", new { chapterId = lesson.ChapterId, courseId = lesson.CourseId });
                 }
-                if (ModelState.IsValid)
-                {
-                    lessonRepository.UpdateLesson(Lesson);
-                }
-                return RedirectToAction(nameof(Index));
+
+                return View(modelsView);
             }
             catch (Exception ex)
             {
                 ViewBag.Message = ex.Message;
-                return View();
-
+                return View(modelsView);
             }
         }
-        
+
         public ActionResult Delete(int? id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-            var Lesson= lessonRepository.GetLessonByID(id.Value);
-            if (Lesson== null)
-            {
-                return NotFound();
-            }
-            return View(Lesson);
+            if (id == null) return NotFound();
+
+            var Lesson = lessonRepository.GetLessonByID(id.Value);
+
+            if (Lesson == null) return NotFound();
+
+            return View(new ModelsView { Lesson = Lesson });
         }
-        //Post Learnercontroller/delete/5
+
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id)
+        public ActionResult Delete(ModelsView modelsView)
         {
             try
             {
-                lessonRepository.DeleteLesson(id);
-                return RedirectToAction(nameof(Index));
+                var lesson = lessonRepository.GetLessonByID(modelsView.Lesson.LessonId);
+                if (lesson != null)
+                {
+                    lessonRepository.DeleteLesson(lesson.LessonId);
+                    return RedirectToAction("Index", new { chapterId = lesson.ChapterId, courseId = lesson.CourseId });
+                }
+                return View(modelsView);
             }
             catch (Exception ex)
 
             {
                 ViewBag.Message = ex.Message;
-                return View();
+                return View(modelsView);
             }
 
         }

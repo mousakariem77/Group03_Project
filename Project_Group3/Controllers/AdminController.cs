@@ -368,7 +368,7 @@ namespace Project_Group3.Controllers
         public ActionResult AccountModeration(int id, Instructor instructor){
             try{
                 if(id != instructor.InstructorId){
-                    return NotFound();
+                    return NotFound(); 
                 }
                 if(ModelState.IsValid){
                     instructor.Status = "Active";
@@ -396,6 +396,89 @@ namespace Project_Group3.Controllers
 
             // Chuyển hướng đến trang login hoặc trang chính
             return RedirectToAction("Login", "Admin");
+        }
+
+        public IActionResult DeleteInstructor(int? id)
+        {
+            if(id == null){
+                return NotFound();
+            }
+            var instructor = instructorRepository.GetInstructorByID(id.Value);
+            if(instructor == null){
+                return NotFound();
+            }
+            return View(instructor);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult DeleteInstructor(int id){
+            try{
+                instructorRepository.DeleteInstructor(id);
+                TempData["DeleteSuccess"] = true;
+                return RedirectToAction("Instructor", "Admin");
+            }catch(Exception ex){
+                ViewBag.Message = ex.Message;
+                return View();
+            }
+        }
+
+        public IActionResult DeleteLearner(int? id)
+        {
+            if(id == null){
+                return NotFound();
+            }
+            var learner = learnerRepository.GetLearnerByID(id.Value);
+            if(learner == null){
+                return NotFound();
+            }
+            return View(learner);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult DeleteLearner(int id){
+            try{
+                learnerRepository.DeleteLearner(id);
+                TempData["DeleteSuccess"] = true;
+                return RedirectToAction("Learner", "Admin");
+            }catch(Exception ex){
+                ViewBag.Message = ex.Message;
+                return View();
+            }
+        }
+
+        [HttpGet]
+          public ActionResult DeleteCourse(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+            var course= courseRepository.GetCourseByID(id.Value);
+            if (course== null)
+            {
+                return NotFound();
+            }
+            return View(course);
+        }
+        //Post Learnercontroller/delete/5
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult DeleteCourse(int id)
+        {
+            try
+            {
+                courseRepository.DeleteCourse(id);
+                return RedirectToAction(nameof(Course));
+            }
+            catch (Exception ex)
+
+            {
+                ViewBag.Message = ex.Message;
+                return View();
+            }
+
         }
     }
 }

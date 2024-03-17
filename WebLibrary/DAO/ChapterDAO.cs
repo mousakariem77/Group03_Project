@@ -46,7 +46,7 @@ namespace WebLibrary.DAO
         {
             Chapter chapter = null;
             try
-            {
+            { 
                 using var context = new DBContext();
                 chapter = context.Chapters.SingleOrDefault(c => c.ChapterId.Equals(chapterID));
 

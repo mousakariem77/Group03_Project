@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Project_Group3.Models;
@@ -23,6 +24,11 @@ namespace Project_Group3.Controllers
         ILessonRepository lessonRepository = null;
         IChapterRepository chapterRepository = null;
         IEnrollmentRepository enrollmentRepository = null;
+        IReportRepository reportRepository = null;
+        ISmtpRepository smtpRepository = null;
+        ICourseProgressRepository courseProgressRepository = null;
+        IChapterProgressRepository chapterProgressRepository = null;
+        ILessonProgressRepository lessonProgressRepository = null;
         
         public HomeController()
         {
@@ -35,6 +41,11 @@ namespace Project_Group3.Controllers
             lessonRepository = new LessonRepository();
             chapterRepository = new ChapterRepository();
             enrollmentRepository = new EnrollmentRepository();
+            reportRepository = new ReportRepository();
+            smtpRepository = new StmpRepository();
+            courseProgressRepository = new CourseProgressRepository();
+            chapterProgressRepository = new ChapterProgressRepository();
+            lessonProgressRepository = new LessonProgressRepository();
         }
 
 
@@ -87,59 +98,205 @@ namespace Project_Group3.Controllers
             return View();
         }
 
-        public IActionResult Profile(int? id)
+        [HttpPost]
+        public IActionResult Contact(Report report)
         {
-            var role = Request.Cookies["Role"];
-            System.Console.WriteLine("role" + role);
-            if (id == null)
+            if (ModelState.IsValid)
             {
-                return NotFound();
-            }
-            if (role == "0")
-            {
-                var learner = learnerRepository.GetLearnerByID(id.Value);
-                var instructor = instructorRepository.GetInstructorByID(id.Value);
-                if (instructor == null)
-                {
-                    return NotFound();
-                }
-                ViewBag.Role = "instructor";
+                report.SubmittedTime = DateTime.Now;
+                reportRepository.AddNew(report);
+                smtpRepository.sendMail("huynhnguyenbao3105@gmail.com", report.Title, "My name is " + report.Name + ". My Email is: " + report.Email + " I wanna say " + report.Content);
 
-                return View(Tuple.Create(instructor, learner));
-            }
-            else if (role == "1")
-            {
-                var learner = learnerRepository.GetLearnerByID(id.Value);
-                var instructor = instructorRepository.GetInstructorByID(id.Value);
-                var enrollment = enrollmentRepository.GetEnrollment();
-
-                if (learner == null)
-                {
-                    return NotFound();
-                }
-                ViewBag.Role = "learner";
-
-                return View(Tuple.Create(instructor, learner, enrollment));
+                return View();
             }
             return View();
         }
 
+        public IActionResult InstructorProfile(int? id)
+        {
+            if (id == null) return NotFound();
+
+            Instructor instructor = instructorRepository.GetInstructorByID(id.Value);
+
+            if (instructor == null) return NotFound();
+
+            ViewBag.Role = "instructor";
+
+            ModelsView modelsView = new ModelsView
+            {
+                Instructor = instructor,
+            };
+
+            return View(modelsView);
+        }
+
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Profile(int id, Learner learner)
+        public ActionResult InstructorProfile(int id, ModelsView models, IFormFile picture)
         {
             try
             {
-                if (id != learner.LearnerId)
+
+                if (id != models.Instructor.InstructorId)
                 {
-                    System.Console.WriteLine(id + " " + learner.Username);
+                    System.Console.WriteLine(id + " " + models.Instructor.InstructorId);
                     return NotFound();
                 }
                 if (ModelState.IsValid)
                 {
+                    instructorRepository.UpdateInstructor(models.Instructor);
+                }
+                return RedirectToAction("InstructorProfile", "Home", new { id = models.Instructor.InstructorId });
+            }
+            catch (Exception ex)
+            {
+                ViewBag.Message = ex.Message;
+                return View();
+            }
+        }
+
+        public IActionResult LearnerProfile(int? id)
+        {
+            var enrollment = enrollmentRepository.GetEnrollment();
+
+            if (id == null) return NotFound();
+
+            Learner learner = learnerRepository.GetLearnerByID(id.Value);
+
+            if (learner == null) return NotFound();
+
+            ViewBag.Role = "learner";
+
+            ModelsView modelsView = new ModelsView
+            {
+                Learner = learner,
+                EnrollmentList = enrollment.ToList(),
+            };
+
+            return View(modelsView);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult LearnerProfile(int id, ModelsView models)
+        {
+            try
+            {
+
+                if (id != models.Learner.LearnerId)
+                {
+                    System.Console.WriteLine(id + " " + models.Learner.LearnerId);
+                    return NotFound();
+                }
+                if (ModelState.IsValid)
+                {
+                    learnerRepository.UpdateLearner(models.Learner);
+                }
+                return RedirectToAction("LearnerProfile", "Home", new { id = models.Learner.LearnerId });
+            }
+            catch (Exception ex)
+            {
+                ViewBag.Message = ex.Message;
+                return View();
+            }
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult DeleteAccountLearner(Learner learner)
+        {
+            try
+            {
+                var i = learnerRepository.GetLearnerByID(learner.LearnerId);
+                if (ModelState.IsValid)
+                {
+                    learner.FirstName = i.FirstName;
+                    learner.LastName = i.LastName;
+                    learner.Gender = i.Gender;
+                    learner.Birthday = i.Birthday;
+                    learner.PhoneNumber = i.PhoneNumber;
+                    learner.Email = i.Email;
+                    learner.Country = i.Country;
+                    learner.Username = i.Username;
+                    learner.Password = i.Password;
+                    learner.Picture = i.Picture;
+                    learner.RegistrationDate = i.RegistrationDate;
+                    learner.Status = "Delete";
                     learnerRepository.UpdateLearner(learner);
                 }
-                return RedirectToAction("Profile", "Home", new { id = learner.LearnerId });
+                foreach (var cookie in HttpContext.Request.Cookies.Keys)
+                {
+                    Response.Cookies.Delete(cookie);
+                }
+
+                HttpContext.Session.Clear();
+
+                return RedirectToAction("Login", "User");
+            }
+            catch (Exception ex)
+            {
+                ViewBag.Message = ex.Message;
+                return View();
+            }
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult DeleteAccountInstructor(Instructor instructor)
+        {
+            try
+            {
+                var i = instructorRepository.GetInstructorByID(instructor.InstructorId);
+                if (ModelState.IsValid)
+                {
+                    instructor.FirstName = i.FirstName;
+                    instructor.LastName = i.LastName;
+                    instructor.Gender = i.Gender;
+                    instructor.Birthday = i.Birthday;
+                    instructor.PhoneNumber = i.PhoneNumber;
+                    instructor.Email = i.Email;
+                    instructor.Country = i.Country;
+                    instructor.Username = i.Username;
+                    instructor.Password = i.Password;
+                    instructor.Picture = i.Picture;
+                    instructor.Income = i.Income;
+                    instructor.Introduce = i.Introduce;
+                    instructor.RegistrationDate = i.RegistrationDate;
+                    instructor.Status = "Delete";
+                    instructorRepository.UpdateInstructor(instructor);
+                }
+                foreach (var cookie in HttpContext.Request.Cookies.Keys)
+                {
+                    Response.Cookies.Delete(cookie);
+                }
+
+                HttpContext.Session.Clear();
+
+                return RedirectToAction("Login", "User");
+            }
+            catch (Exception ex)
+            {
+                ViewBag.Message = ex.Message;
+                return View();
+            }
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult Delete(int id)
+        {
+            try
+            {
+                var learner = learnerRepository.GetLearnerByID(id);
+                if (learner == null)
+                {
+                    return NotFound();
+                }
+
+                learner.Status = "Delete";
+                learnerRepository.UpdateLearner(learner);
+
+                return RedirectToAction("Instructor", "Admin");
             }
             catch (Exception ex)
             {
@@ -180,15 +337,20 @@ namespace Project_Group3.Controllers
             {
                 return NotFound();
             }
-            var course = courseRepository.GetCourseByID(id.Value);
+            var course = courseRepository.GetCourses();
+            var chapter = chapterRepository.GetChapterByID(id.Value);
             if (course == null)
             {
                 return NotFound();
             }
 
-            var chapter = chapterRepository.GetChapters();
-            var lesson = lessonRepository.GetLessons();
-            return View(Tuple.Create(course, chapter, lesson));
+            var chapterList = chapterRepository.GetChapters();
+            var lessonList = lessonRepository.GetLessons();
+            var courseProgress = courseProgressRepository.GetCourseProgresss();
+            var chapterProgress = chapterProgressRepository.GetChapterProgresss();
+            var lessonProgress = lessonProgressRepository.GetLessonProgresss();
+            var learner = learnerRepository.GetLearners();
+            return View(Tuple.Create(chapter, chapterList, lessonList, courseProgress, chapterProgress, lessonProgress, course));
         }
 
         public IActionResult CheckOut(int? id)
@@ -197,6 +359,13 @@ namespace Project_Group3.Controllers
 
             return View(learner);
         }
+
+        public IActionResult QA()
+        {
+            // TODO: Your code here
+            return View();
+        }
+        
 
     }
 }

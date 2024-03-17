@@ -14,6 +14,7 @@ namespace WebLibrary.Repository
         public void InsertAdmin(Admin admin) => AdminDAO.Instance.AddNew(admin);
         public void DeleteAdmin(int adminId) => AdminDAO.Instance.Remove(adminId);
         public void UpdateAdmin(Admin admin) => AdminDAO.Instance.Update(admin); 
+ 
         public bool CheckLogin(string username, string pass) => AdminDAO.Instance.VerifyPassword(username, pass);
 
         public Admin GetAdminByUsername(string username) => AdminDAO.Instance.GetAdminByUsername(username);

@@ -11,6 +11,8 @@ using WebLibrary.DAO;
 using Microsoft.AspNetCore.Http;
 using Project_Group3.Models;
 using Microsoft.AspNetCore.Identity;
+using System.Text;
+using System.Security.Cryptography;
 
 namespace Project_Group3.Controllers
 {
@@ -20,6 +22,7 @@ namespace Project_Group3.Controllers
         ILearnerRepository learnerRepository = null;
         IAdminRepository adminRepository = null;
         ISmtpRepository smtpRepository = null;
+        private string tmpEmail;
         public UserController()
         {
             learnerRepository = new LearnerRepository();
@@ -63,14 +66,12 @@ namespace Project_Group3.Controllers
 
                 var instructor = instructorRepository.GetInstructorByEmailOrUser(model.EmailOrUsername);
                 var learner = learnerRepository.GetLearnerByEmailOrUser(model.EmailOrUsername);
-                // var admin = adminRepository.GetAdminByUsername(model.EmailOrUsername);
 
 
                 if (instructor != null && instructor.Password == model.Password)
                 {
                     // HttpContext.Session.SetString("UserRole", "Instructor");
-                    // HttpContext.Session.SetInt32("InsID", instructor.InstructorId);
-                    // Response.Cookies.Append("MyCookie", instructor.InstructorId.ToString());
+                    HttpContext.Session.SetInt32("InsID", instructor.InstructorId);
                     if(instructor.Status == "Wait"){
                         ViewBag.err = "The account has not been moderated!!!";
                         return View();
@@ -78,7 +79,7 @@ namespace Project_Group3.Controllers
                         ViewBag.err = "The account no longer exists!!!";
                         return View();
                     }
-                    Response.Cookies.Append("Role", "0");
+                    Response.Cookies.Append("Role", "instructor");
                     Response.Cookies.Append("Name", instructor.Username);
                     Response.Cookies.Append("ID", instructor.InstructorId.ToString());
                     return RedirectToAction("Index", "Home");
@@ -87,7 +88,7 @@ namespace Project_Group3.Controllers
                 else if (learner != null && learner.Password == model.Password)
                 {
                     // HttpContext.Session.SetString("UserRole", "Learner");
-                    Response.Cookies.Append("Role", "1");
+                    Response.Cookies.Append("Role", "learner");
                     HttpContext.Session.SetInt32("LearnerID", learner.LearnerId);
                     Console.WriteLine($"LearnerID: {HttpContext.Session.GetInt32("LearnerID")}");
                     // Response.Cookies.Append("MyCookie", learner.LearnerId.ToString());
@@ -148,7 +149,6 @@ namespace Project_Group3.Controllers
                     Password = model.Password,
                     Picture = model.Picture,
                     RegistrationDate = DateTime.Now.Date,
-                    Wallet = 0,
                     Status = "Active",
                 };
                 learnerRepository.InsertLearner(LearnerModel);
@@ -246,6 +246,159 @@ namespace Project_Group3.Controllers
 
             // Chuyển hướng đến trang login hoặc trang chính
             return RedirectToAction("Login", "User");
+        }
+
+        public int Random()
+        {
+            Random random = new Random();
+            int otp = random.Next(10000, 99999);
+
+            HttpContext.Session.SetInt32("otp", otp);
+            return otp;
+        }
+
+        public IActionResult ResetPassword()
+        {
+            // TODO: Your code here
+            return View();
+        }
+        
+        public IActionResult otp(string email)
+        {
+            int random = Random();
+
+            System.Console.WriteLine(random);
+
+            string tmpEmail = HttpContext.Session.GetString("email");
+
+            if (!string.IsNullOrEmpty(tmpEmail)) smtpRepository.sendMail(tmpEmail, "Mã xác thực OTP", $"Mã xác thực OTP của bạn là: [{random}], tuyệt đối không chia sẻ mã này cho người khác!");
+
+            else return RedirectToAction("CheckEmail");
+
+            return View(email);
+        }
+
+
+        [HttpPost]
+        public IActionResult otp(int otp, int otp1, int otp2, int otp3, int otp4)
+        {
+            int otpValue = otp * 10000 + otp1 * 1000 + otp2 * 100 + otp3 * 10 + otp4;
+
+            if (HttpContext.Session.GetInt32("otp") == otpValue) return View("ResetPassword");
+
+            return View();
+        }
+
+        public IActionResult CheckEmail() => View();
+
+
+        [HttpPost]
+        public IActionResult CheckEmail(string email)
+        {
+            try
+            {
+                var learner = learnerRepository.GetLearnerByEmail(email);
+                var instructor = instructorRepository.GetInstructorByEmail(email);
+
+                string UserMail = learner?.Email ?? instructor?.Email ?? "";
+
+                if (UserMail == null) return View();
+
+                HttpContext.Session.SetString("email", UserMail);
+
+                return RedirectToAction("otp");
+
+            }
+            catch (System.Exception)
+            {
+                return View(email);
+            }
+        }
+
+        [HttpPost]
+        public IActionResult ResetPassword(string password, string confirmPassword)
+        {
+            try
+            {
+                if (password != confirmPassword) return View(ViewBag.err = "Mk Không khớp");
+
+                string email = HttpContext.Session.GetString("email");
+
+                if (email != null)
+                {
+                    var learner = learnerRepository.GetLearnerByEmail(email);
+                    var instructor = instructorRepository.GetInstructorByEmail(email);
+                    if (learner != null)
+                    {
+                        learnerRepository.UpdatePass(learner.LearnerId, password);
+                    }
+
+                    if (instructor != null)
+                    {
+                        instructorRepository.UpdatePass(instructor.InstructorId, password);
+                    }
+                }
+                return RedirectToAction("Login");
+            }
+            catch (System.Exception)
+            {
+                throw;
+            }
+        }
+        [HttpPost]
+        public IActionResult ChangePassword(string email, string password, string newPassword, string confirmPassword)
+        {
+            try
+            {
+
+                if (newPassword != confirmPassword) return View();
+
+                if (email != null)
+                {
+                    var learner = learnerRepository.GetLearnerByEmail(email);
+                    var instructor = instructorRepository.GetInstructorByEmail(email);
+                    if (learner != null)
+                    {
+                        learnerRepository.UpdatePass(learner.LearnerId, newPassword);
+                    }
+
+                    if (instructor != null)
+                    {
+                        instructorRepository.UpdatePass(instructor.InstructorId, newPassword);
+                    }
+                }
+                
+                foreach (var cookie in HttpContext.Request.Cookies.Keys)
+                {
+                    Response.Cookies.Delete(cookie);
+                }
+
+                // Xóa session
+                HttpContext.Session.Clear(); // Hoặc HttpContext.Session.Remove("UserId");
+
+                // Chuyển hướng đến trang login hoặc trang chính
+                return RedirectToAction("Login", "User");
+            }
+            catch (System.Exception)
+            {
+                throw;
+            }
+        }
+
+        private string GetHashedPassword(string password)
+        {
+            using (MD5 md5 = MD5.Create())
+            {
+                byte[] hashBytes = md5.ComputeHash(Encoding.UTF8.GetBytes(password));
+                StringBuilder sb = new StringBuilder();
+
+                for (int i = 0; i < hashBytes.Length; i++)
+                {
+                    sb.Append(hashBytes[i].ToString("x2"));
+                }
+
+                return sb.ToString();
+            }
         }
     }
 }

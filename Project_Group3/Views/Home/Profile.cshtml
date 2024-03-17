@@ -5,7 +5,7 @@
     Layout = "~/Views/Shared/_LayoutHome.cshtml";
     var role = Context.Request.Cookies["Role"];
 }
-<link rel="stylesheet" href="~/css/site.css" />
+<link rel="stylesheet" href="~/css/style.css" />
 <link rel="stylesheet" href="~/js/site.js" />
 <link rel="stylesheet" href="~/fonts/boxicons.css" />
 
@@ -57,7 +57,7 @@
                                     </div>
                                     <div class="info-title col-md-8 col-lg-8 text-dark">
                                         @{
-                                            if(role == "0"){
+                                            if(role == "instructor"){
                                                 <div class="d-flex" style="justify-content: space-between;">
                                                     <label>@Model.Item1.FirstName @Model.Item1.LastName</label>
                                                     <a class="btn mr-2" style="cursor: pointer;" data-bs-toggle="modal" data-bs-target="#edit" title="Edit">
@@ -69,7 +69,7 @@
                                                 <label>@Model.Item1.PhoneNumber</label><br>
                                                 <label>@Model.Item1.Email</label><br>
                                                 <label>@Model.Item1.Country</label><br>
-                                            }else if(role == "1"){
+                                            }else if(role == "learner"){
                                                 <div class="d-flex" style="justify-content: space-between;">
                                                     <label>@Model.Item2.FirstName @Model.Item2.LastName</label>
                                                     <a class="btn mr-2" style="cursor: pointer;" data-bs-toggle="modal" data-bs-target="#edit" title="Edit">
@@ -170,7 +170,7 @@
                             foreach(var enrollment in Model.Item3){
                                 if(Model.Item2.LearnerId == enrollment.LearnerId){
                                     countEnrollment++;
-                                    <div class="col-md-12 col-lg-12 bg-white py-3" data-bs-toggle="collapse" data-bs-target="#en@(countEnrollment)">
+                                    <div class="col-md-12 col-lg-12 bg-white py-3 mb-2" data-bs-toggle="collapse" data-bs-target="#en@(countEnrollment)">
                                         <div class="transaction-info">
                                             <strong>Date:</strong> @enrollment.EnrollmentDate
                                             <br>
@@ -180,14 +180,17 @@
                                         <div id="en@(countEnrollment)" class="collapse">
                                             @{
                                                 if(@enrollment.IsPaid == true){
-                                                    <strong>Status:</strong><small>Đã thanh toán</small>
+                                                    <strong>Status: </strong><small style="font-size: .9rem;" class="text-success">Success</small>
                                                 }else{
-                                                    <strong>Status:</strong><small>Chưa thanh toán</small>
+                                                    <strong>Status: </strong><small style="font-size: .9rem;" class="text-danger">Fail</small>
                                                 }
                                             }
-                                            Lorem ipsum dolor sit amet, consectetur adipisicing elit,
-                                            sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
-                                            quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+                                            <br>
+                                            <strong>Details:</strong>
+                                            This transaction is for the course "@enrollment.CourseName" enrolled on @enrollment.EnrollmentDate. 
+                                            The payment for this course has been successfully processed and the status is marked as paid. You have
+                                             successfully completed the payment for the course and gained access to all course materials and resources. 
+                                             Enjoy your learning journey and make the most out of the course content to enhance your web development skills.sequat.
                                         </div>
                                     </div>
                                 }
@@ -213,7 +216,7 @@
         </div>
         <div class="modal-body">
             @{
-                if(role == "0"){
+                if(role == "instructor"){
                     <form action="@Url.Action("EditProfile", "Instructor", new { id = Model.Item1.InstructorId })" method="post" class="mb-3" enctype="multipart/form-data">
                         <div class="container-fluid">
                             <div class="d-flex align-items-start align-items-sm-center">
@@ -273,8 +276,8 @@
                         <a asp-action="Index" class="btn btn-secondary mt-2 float-right">Cancel</a>
                         <button type="submit" class="btn btn-success mr-3 mt-2 float-right">Save</button>
                     </form>
-                }else if(role == "1"){
-                    <form action="@Url.Action("EditProfile", "Learner",  new { id = Model.Item2.LearnerId })" method="post" class="mb-3" enctype="multipart/form-data">
+                }else if(role == "learner"){
+                    <form action="@Url.Action("Profile", "Learner",  new { id = Model.Item2.LearnerId })" method="post" class="mb-3" enctype="multipart/form-data">
                         <div class="container-fluid">
                             <input type="hidden" asp-for="@Model.Item2.LearnerId"/>
                             <div class="d-flex align-items-start align-items-sm-center">

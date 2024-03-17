@@ -41,6 +41,41 @@ namespace Project_Group3.DAO
             }
             return instructors;
         }
+
+        public Instructor GetInstructorByEmail(string email)
+        {
+            Instructor instructor = null;
+            try
+            {
+                using var context = new DBContext();
+                instructor = context.Instructors.SingleOrDefault(p => p.Email == email);
+
+            }
+            catch (System.Exception)
+            {
+
+                throw;
+            }
+            return instructor;
+        }
+
+        public Instructor GetInstructorByUser(string user)
+        {
+            Instructor instructor = null;
+            try
+            {
+                using var context = new DBContext();
+                instructor = context.Instructors.SingleOrDefault(p => p.Username == user);
+
+            }
+            catch (System.Exception)
+            {
+
+                throw;
+            }
+            return instructor;
+        }
+
         public Instructor GetInstructorByID(int instructorID)
         {
             Instructor instructor = null;
@@ -125,6 +160,65 @@ namespace Project_Group3.DAO
             catch (Exception ex)
             {
                 throw new Exception(ex.Message);
+            }
+        }
+
+
+        public bool VerifyPassword(string pass, string InstructorPassword)
+        {
+            return String.Equals(pass, InstructorPassword, StringComparison.OrdinalIgnoreCase);
+        }
+
+        public bool VerifyUserName(string user, string InstructorUserName)
+        {
+            return String.Equals(user, InstructorUserName, StringComparison.OrdinalIgnoreCase);
+        }
+
+        public bool VerifyEmail(string email, string InstructorEmail)
+        {
+            return String.Equals(email, InstructorEmail, StringComparison.OrdinalIgnoreCase);
+        }
+
+        public bool CheckEmailAndUser(string EmaiOrUser, string InstructEmail, string InstructorUserName)
+        {
+            return String.Equals(EmaiOrUser, InstructEmail, StringComparison.OrdinalIgnoreCase) || String.Equals(EmaiOrUser, InstructorUserName, StringComparison.OrdinalIgnoreCase);
+        }
+
+        public Instructor Get1InstructorByEmailOrUser(string EmailOrUserName)
+        {
+            Instructor instructor = null;
+
+            try
+            {
+                using var context = new DBContext();
+                instructor = context.Instructors.FirstOrDefault(c => c.Username == EmailOrUserName || c.Email == EmailOrUserName);
+            }
+            catch (Exception ex)
+            {
+                // Xử lý ngoại lệ, ví dụ: ghi log
+                Console.WriteLine($"Error in Get1InstructorByEmailOrUser: {ex.Message}");
+                // Có thể ném lại ngoại lệ nếu bạn muốn thông báo lên tầng cao hơn.
+            }
+
+            return instructor;
+        }
+
+        public void UpdatePass(int id, string pass)
+        {
+            Instructor existingIns = GetInstructorByID(id);
+            if (existingIns != null)
+            {
+                existingIns.Password = pass;
+
+                using (var context = new DBContext())
+                {
+                    context.Instructors.Update(existingIns);
+                    context.SaveChanges();
+                }
+            }
+            else
+            {
+                throw new Exception("The learner does not exist.");
             }
         }
     }
